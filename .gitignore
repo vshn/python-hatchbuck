@@ -1,0 +1,19 @@
+# pycharm
+/.idea/tasks.xml
+/.idea/workspace.xml
+
+# cache
+*.py[cod]
+__pycache__/
+
+# virtualenv
+/virtualenv/
+
+# packaging
+/crmngr.egg-info/
+/dist/
+/build/
+
+# testing
+/.cache/
+/pytestdebug.log
