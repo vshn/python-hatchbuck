@@ -6,15 +6,28 @@ import datetime
 log = logging.getLogger(__name__)
 
 class Hatchbuck():
+    """
+    Class to interact with the Hatchbuck.com API
+    """
     url = "https://api.hatchbuck.com/api/v1/"
     key = None
     noop = False
 
     def __init__(self, key, noop=False):
+        """
+            Initialize API session with settings for the whole session
+        :param key: Hatchbuck API key token,
+        :param noop: dry-run-mode, no not call the API
+        """
         self.key = key
         self.noop = noop
-
+    
     def search_email(self, email):
+        """
+        Search for profiles, and search for email addresses within them
+        :param email:The email address we're looking for
+        :return:Return profile if it contains the email address or return None
+        """
         query = {'emails': [{'address': email}]}
         log.debug("searching for {0}".format(query))
         r = requests.post(self.url + 'contact/search' + '?api_key=' + self.key, json=query)
@@ -33,7 +46,15 @@ class Hatchbuck():
             log.debug("not found")
             return None
 
+
+
     def search_name(self, first, last):
+        """
+        Search for profiles, and search for first and last within them
+        :param first:The first name we're looking for
+        :param last:The last name we're looking for
+        :return:Return profile or return None
+        """
         query = {'firstName': first, 'lastName': last}
         log.debug("searching for {0}".format(query))
         r = requests.post(self.url + 'contact/search' + '?api_key=' + self.key, json=query)
@@ -46,7 +67,11 @@ class Hatchbuck():
             return None
 
     def search_email_multi(self, emails):
-        # search multiple emails and return the first user profile that matches
+        """
+        Search for email addresses in the email address list
+        :param emails:A list of email addresses
+        :return:Return the first user profile that matches
+        """
         if type(emails) == type(str()):
             emails = [emails]
         for email in emails:
@@ -58,6 +83,12 @@ class Hatchbuck():
         return None
 
     def update(self, contactId, profile):
+        """
+        Update an existing contact
+        :param contactId:The contact ID we want to update
+        :param profile:The profile information we want the contactID to have
+        :return:Return profile with updates if successful or None if fail
+        """
         profile['contactId'] = contactId
         log.debug("updating {0}".format(profile))
         if self.noop:
@@ -72,7 +103,13 @@ class Hatchbuck():
             log.debug("fail: {0}".format(r.text))
             return None
 
+
     def create(self, profile):
+        """
+        Create a new profile
+        :param profile:The profile we want to create
+        :return:Return the new profile with the new contactID if successful or None if fail
+        """
         log.debug("creating {0}".format(profile))
         if self.noop:
             profile['contactId'] = None
@@ -86,7 +123,14 @@ class Hatchbuck():
             log.debug("fail: {0}".format(r.text))
             return None
 
+
     def profile_add_address(self, profile, address, addresstype):
+        """
+        :param profile:
+        :param address:
+        :param addresstype:
+        :return:
+        """
         try:
             country = countries.get(alpha2=address['country']).name
         except:
@@ -132,6 +176,14 @@ class Hatchbuck():
         return profile
 
     def profile_contains(self, profile, dictname, attributename, value):
+        """
+
+        :param profile:hatchbuck contact profile
+        :param dictname:the information in the profile dictionary
+        :param attributename:A attribut that shows address(email, phone, ...)
+        :param value:Values of attributename (email, phone, ...)
+        :return:Return true when get a value matching the values in the dictionary, or flase In the opposite case
+        """
         # check if a certain email/phone/website address is already in the hatchbuck contact profile
         # the hatchbuck profile is built up like:
         # profile = {
@@ -160,6 +212,14 @@ class Hatchbuck():
         return False
 
     def profile_add(self, profile, dictname, attributename, valuelist, moreattributes={}):
+        """
+        :param profile:
+        :param dictname:
+        :param attributename:
+        :param valuelist:
+        :param moreattributes:
+        :return:
+        """
         # add a certain email/phone/website field to the hatchbuck contact profile if it's not there already
         # the hatchbuck profile is built up like:
         # profile = {
@@ -199,7 +259,14 @@ class Hatchbuck():
                 log.debug("skipping update because value empty or there already: {0}".format(updateprofile))
         return profile
 
+
     def add_tag(self, contactId, tagname):
+        """
+        Add tags by contact id
+        :param contactId: A contact ID to which the tag should be added
+        :param tagname: Tag that we want to add to contactId
+        :return: Return Add the tag if success or the Tag does not add if fail
+        """
         log.debug("adding tag {0} to contact {1}".format(tagname, contactId))
         profile = [{'name': tagname}]
         if self.noop:
@@ -210,7 +277,14 @@ class Hatchbuck():
         else:
             log.debug("fail: {0}".format(r.text))
 
+
     def profile_add_birthday(self, profile, date):
+        """
+        Add birthday to profile
+        :param profile: A profile to which the birthday should be added
+        :param date: The birthday should be added to the file
+        :return:Return profile after adding the birthday
+        """
         if not date.get('day',0) or not date.get('month',0):
             log.debug("no day/month in birthday {0}, skipping".format(date))
             return profile
