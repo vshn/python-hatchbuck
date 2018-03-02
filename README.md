@@ -135,8 +135,8 @@
 
 * ## Profile updated
 * ## Create profile
-* ## Add address to profile
-* ## profile contains
+* ## Add address to profile
+* ## profile contains
 * ## Add a profile
 * ## Add tags
 * ## Add birthday to profile
