@@ -17,10 +17,10 @@
     $ python basharexample.py -c aarno.yaml -v
 
 
-####This python package provides an easy to use python module to interact with the [hatchbuck.com API][https://hatchbuck.freshdesk.com/support/solutions/articles/5000578765-hatchbuck-api-documentation-for-advanced-users-]
+#### This python package provides an easy to use python module to interact with the [hatchbuck.com API][https://hatchbuck.freshdesk.com/support/solutions/articles/5000578765-hatchbuck-api-documentation-for-advanced-users-]
 
 ## Examples
-* Search for email
+* ## Search for email
 
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 
@@ -31,7 +31,7 @@
     $ python basharexample.py -c aarno.yaml -v
 
 
-* Search for the Full name
+* ## Search for the Full name
 
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 
@@ -42,7 +42,7 @@
     $ python basharexample.py -c aarno.yaml -v
 
 
-* Search for multiple emails
+* ## Search for multiple emails
 
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 
