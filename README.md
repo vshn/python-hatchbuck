@@ -30,6 +30,64 @@
 
     $ python basharexample.py -c aarno.yaml -v
 
+### output:
+
+{'addresses': [{'city': 'Zürich',
+    'country': 'Switzerland',
+    'countryId': 'QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1',
+    'id': 'Q0NjajF2U1lTWnBHM1hjRFlnQzhzMHZ2UUxLY2d6a1JaU3Nicm5hRTN6azE1',
+    'state': 'ZH',
+    'street': 'Neugasse 10',
+    'type': 'Work',
+    'typeId': 'SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1',
+    'zip': '8005'}],
+'campaigns': [],
+'company': 'VSHN AG',
+'contactId': 'SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1',
+'customFields': [{'name': 'Comments', 'type': 'MText', 'value': ''},
+    {'name': 'Invoiced', 'type': 'Number', 'value': ''},
+    {'name': 'Language', 'type': 'Text', 'value': ''},
+    {'name': 'working at company since',
+    'type': 'Text',
+    'value': '1.1.2018'},
+    {'name': 'company size', 'type': 'Text', 'value': '25'},
+    {'name': 'Birthday', 'type': 'Date', 'value': ''}],
+'emails': [{'address': 'bashar.said@vshn.ch',
+    'id': 'S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1',
+    'type': 'Work',
+    'typeId': 'VmhlQU1pZVJSUFFJSjZfMHRmT1laUmwtT0FMNW9hbnBuZHd2Q1JTdE0tYzE1'}],
+'firstName': 'Bashar',
+'instantMessaging': [],
+'lastName': 'Said',
+'phones': [{'id': 'OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4TVppZlF4NklrNmZfSnBhaDZwQTE1',
+    'number': '+(414) 454-5 53 00',
+    'type': 'Work',
+    'typeId': 'QTBncHV0dndnaGNnRVMzLTR0SGtFRmRvZjdqNm4zcVphQi1XX1Z2MXVtRTE1'}],
+    'referredBy': '',
+'salesRep': {'id': 'VGpwQTRGTmw4MExVODl1b1BmXzBodTBwWnZXS2dUZzVvSkJKZUx4UlFpdzE1',
+    'username': 'aarno.aukia'},
+'socialNetworks': [{'address': 'https://twitter.com/bashar_2018',
+    'id': 'S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg5Z3piMERVbEFsam42azE1',
+    'type': 'Twitter',
+    'typeId': 'ZGRlMHpBaXY3M05YUGc4a0pIY3lRdUFKN1JYaDd2VEphbzhSRkdzM2x4bzE1'},
+    {'address': 'https://www.linkedin.com/in/bashar-said-729a54156/',
+    'id': 'Tzd0TTBueVQzS09JQVZTLUxiUUxUT25VMmVvT0dua2txc2NHZkNkNEg5VTE1',
+    'type': 'LinkedIn',
+    'typeId': 'Q2dJTVQ1NW9UYzhJeUd4ckI0dWFNWkpLOUxyTXVGUFVjQlZYbVM2ZlI4bzE1'}],
+'source': {'id': 'MHZFdHZqcWVXT1IyNHZGYlM1RGppWVVJcGc3aHgtU3lXRWtfQmFXN0lCODE1',
+    'name': 'vshn.ch'},
+'status': {'id': 'UE9zMy1abnhnNUJQWnVORE5BQzNicUFWQ3huLXF2eGlSdlIyYVFmVXh4UTE1',
+    'name': 'Employee'},
+'subscribed': True,
+'tags': [],
+'temperature': {'id': 'UTI0Nm14TlB4SmRkdVNLMjNWQWgwR2R2TjhySE1US1RtVEQ0T24tRWtFbzE1',
+    'name': 'Hot'},
+'timezone': 'W. Europe Standard Time',
+'title': 'DevOps Engineer Intern',
+'website': [{'id': 'bktodFBCalVCU2J6aFhjaXc5UVZkUHM5OHFnd0ZuQmdJTTU0cDRScm1KSTE1',
+    'websiteUrl': 'https://vshn.ch'}]}
+
+
 
 * ## Search for the Full name
 
@@ -48,16 +106,18 @@
 
     profile = hatchbuck.search_email_multi(['sgdhfgfdgh@fdvd.com', 'bashar.said@vshn.ch'])
 
+    - The emails must be in list form
+
     pp.pprint(profile)
 
     $ python basharexample.py -c aarno.yaml -v
 
 
 
-* Profile updated
-* Create profile
-* Add address to profile
-* profile contains
-* Add a profile
-* Add tags
-* Add birthday to profile
+* ## Profile updated
+* ## Create profile
+* ## Add address to profile
+* ## profile contains
+* ## Add a profile
+* ## Add tags
+* ## Add birthday to profile
