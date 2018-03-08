@@ -175,7 +175,7 @@
     2018-03-08 11:00:21,860 - hatchbuck - DEBUG - not found
 ```
 
-##### We did not find a profile with an email address: 'sgdhfgfdgh@fdvd.com'
+#### We did not find a profile with an email address: 'sgdhfgfdgh@fdvd.com'
 ```
     2018-03-08 11:00:21,860 - hatchbuck - DEBUG - searching for {'emails': [{'address': 'bashar.said@vshn.ch'}]}
     2018-03-08 11:00:21,862 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
@@ -183,7 +183,8 @@
     2018-03-08 11:00:22,643 - hatchbuck - DEBUG - found: {......}
 ```
 
-#### We found a profile with his email address: 'bashar.said@vshn.ch'
+#### We found a profile with his email address: 'bashar.said@vshn.ch'  
+
 ### output
 
 ```
