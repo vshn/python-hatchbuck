@@ -5,13 +5,10 @@
 
     $ pip install hatchbuck
 
-## Basic Usage#
+## Basic Usage
     from hatchbuck import Hatchbuck
-
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
-
     profile = hatchbuck. ...('...', ...)
-
     pp.pprint(profile)
 
     $ python basharexample.py -c aarno.yaml -v
@@ -21,12 +18,13 @@
 
 ## Examples
 
-* ## Search for email#
+## Search for email
 
 ```
 hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 profile = hatchbuck.search_email('bashar.said@vshn.ch')
 pp.pprint(profile)
+
 $ python basharexample.py -c aarno.yaml -v
 
 ```
