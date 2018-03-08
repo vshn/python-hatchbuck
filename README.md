@@ -1,7 +1,7 @@
 
-# Hatchbuck.com CRM API bindings for python
-## Installation
-    The easiest way to install hatchbuck is with pip:
+#Hatchbuck.com CRM API bindings for python
+##Installation
+  The easiest way to install hatchbuck is with pip:
 
     $ pip install hatchbuck
 
@@ -17,11 +17,11 @@
     $ python basharexample.py -c aarno.yaml -v
 
 
-#### This python package provides an easy to use python module to interact with the [hatchbuck.com API][https://hatchbuck.freshdesk.com/support/solutions/articles/5000578765-hatchbuck-api-documentation-for-advanced-users-]
+#### This python package provides an easy to use python module to interact with the [hatchbuck.com API](https://hatchbuck.freshdesk.com/support/solutions/articles/5000578765-hatchbuck-api-documentation-for-advanced-users)
 
 ## Examples
 * ## Search for email
-
+```
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 
     profile = hatchbuck.search_email('bashar.said@vshn.ch')
@@ -29,9 +29,10 @@
     pp.pprint(profile)
 
     $ python basharexample.py -c aarno.yaml -v
+```
+### output
 
-### output:
-
+```
 {'addresses': [{'city': 'Zürich',
     'country': 'Switzerland',
     'countryId': 'QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1',
@@ -41,13 +42,15 @@
     'type': 'Work',
     'typeId': 'SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1',
     'zip': '8005'}],
-
+    ```
+```
 'campaigns': [],
 
 'company': 'VSHN AG',
 
 'contactId': 'SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1',
-
+```
+```
 'customFields': [{'name': 'Comments', 'type': 'MText', 'value': ''},
     {'name': 'Invoiced', 'type': 'Number', 'value': ''},
     {'name': 'Language', 'type': 'Text', 'value': ''},
@@ -56,7 +59,8 @@
     'value': '1.1.2018'},
     {'name': 'company size', 'type': 'Text', 'value': '25'},
     {'name': 'Birthday', 'type': 'Date', 'value': ''}],
-
+```
+```
 'emails': [{'address': 'bashar.said@vshn.ch',
     'id': 'S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1',
     'type': 'Work',
@@ -67,16 +71,19 @@
 'instantMessaging': [],
 
 'lastName': 'Said',
-
+```
+```
 'phones': [{'id': 'OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4TVppZlF4NklrNmZfSnBhaDZwQTE1',
     'number': '+(414) 454-5 53 00',
     'type': 'Work',
     'typeId': 'QTBncHV0dndnaGNnRVMzLTR0SGtFRmRvZjdqNm4zcVphQi1XX1Z2MXVtRTE1'}],
     'referredBy': '',
-
+```
+```
 'salesRep': {'id': 'VGpwQTRGTmw4MExVODl1b1BmXzBodTBwWnZXS2dUZzVvSkJKZUx4UlFpdzE1',
     'username': 'aarno.aukia'},
-
+```
+```
 'socialNetworks': [{'address': 'https://twitter.com/bashar_2018',
     'id': 'S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg5Z3piMERVbEFsam42azE1',
     'type': 'Twitter',
@@ -85,52 +92,81 @@
     'id': 'Tzd0TTBueVQzS09JQVZTLUxiUUxUT25VMmVvT0dua2txc2NHZkNkNEg5VTE1',
     'type': 'LinkedIn',
     'typeId': 'Q2dJTVQ1NW9UYzhJeUd4ckI0dWFNWkpLOUxyTXVGUFVjQlZYbVM2ZlI4bzE1'}],
-
+```
+```
 'source': {'id': 'MHZFdHZqcWVXT1IyNHZGYlM1RGppWVVJcGc3aHgtU3lXRWtfQmFXN0lCODE1',
     'name': 'vshn.ch'},
-
+```
+```
 'status': {'id': 'UE9zMy1abnhnNUJQWnVORE5BQzNicUFWQ3huLXF2eGlSdlIyYVFmVXh4UTE1',
     'name': 'Employee'},
 
 'subscribed': True,
 
 'tags': [],
-
+```
+```
 'temperature': {'id': 'UTI0Nm14TlB4SmRkdVNLMjNWQWgwR2R2TjhySE1US1RtVEQ0T24tRWtFbzE1',
     'name': 'Hot'},
 
 'timezone': 'W. Europe Standard Time',
-
+```
+```
 'title': 'DevOps Engineer Intern',
-
+```
+```
 'website': [{'id': 'bktodFBCalVCU2J6aFhjaXc5UVZkUHM5OHFnd0ZuQmdJTTU0cDRScm1KSTE1',
     'websiteUrl': 'https://vshn.ch'}]}
-
+```
 
 
 * ## Search for the Full name
+ ```
+	hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 
-    hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
+	profile = hatchbuck.search_name('bashar', 'said')
 
-    profile = hatchbuck.search_name('bashar', 'said')
+	pp.pprint(profile)
 
-    pp.pprint(profile)
+	$ python basharexample.py -c aarno.yaml -v
 
-    $ python basharexample.py -c aarno.yaml -v
-
+ ```
+### output
+```
+We get the same results When we search by email address because the firstname and lastname(bashar, said) belong to the same email address(bashar.said@vshn.ch)
+```
 
 * ## Search for multiple emails
-
+ ```
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 
-    profile = hatchbuck.search_email_multi(['sgdhfgfdgh@fdvd.com', 'bashar.said@vshn.ch'])
-
-    - The emails must be in list form
+    profile = hatchbuck.search_email_multi(['sgdhfgfdgh@fdvd.com', 'bashar.said@vshn.ch', ...])
 
     pp.pprint(profile)
 
     $ python basharexample.py -c aarno.yaml -v
 
+ ```
+  **Note:** The emails must be in list form, and the search process stops getting the first match
+### output
+```
+2018-03-08 11:00:21,079 - hatchbuck - DEBUG - searching for {'emails': [{'address': 'sgdhfgfdgh@fdvd.com'}]}
+2018-03-08 11:00:21,091 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
+2018-03-08 11:00:21,857 - requests.packages.urllib3.connectionpool - DEBUG - "POST /api/v1/contact/search?
+2018-03-08 11:00:21,860 - hatchbuck - DEBUG - not found
+```
+#####We did not find a profile with an email address: 'sgdhfgfdgh@fdvd.com'
+```
+2018-03-08 11:00:21,860 - hatchbuck - DEBUG - searching for {'emails': [{'address': 'bashar.said@vshn.ch'}]}
+2018-03-08 11:00:21,862 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
+2018-03-08 11:00:22,641 - requests.packages.urllib3.connectionpool - DEBUG - "POST /api/v1/contact/search?
+2018-03-08 11:00:22,643 - hatchbuck - DEBUG - found: {......}
+```
+####We found a profile with his email address: 'bashar.said@vshn.ch'
+### output
+```
+We get the same results When we search by email address
+```
 
 
 * ## Profile updated
