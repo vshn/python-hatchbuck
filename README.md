@@ -1,14 +1,17 @@
 
 # Hatchbuck.com CRM API bindings for python
-## Installation#
+## Installation
     The easiest way to install hatchbuck is with pip:
 
     $ pip install hatchbuck
 
 ## Basic Usage
     from hatchbuck import Hatchbuck
+
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
+
     profile = hatchbuck. ...('...', ...)
+
     pp.pprint(profile)
 
     $ python basharexample.py -c aarno.yaml -v
@@ -18,15 +21,13 @@
 
 ## Examples
 
-## Search for email
+* ## Search for email
 
 ```
 hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 profile = hatchbuck.search_email('bashar.said@vshn.ch')
 pp.pprint(profile)
-
 $ python basharexample.py -c aarno.yaml -v
-
 ```
 
 ### output
@@ -125,7 +126,7 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 
 
-## Search for the Full name
+* ## Search for the Full name
 
  ```
 	hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
@@ -140,8 +141,7 @@ $ python basharexample.py -c aarno.yaml -v
     We get the same results When we search by email address because the firstname and lastname(bashar, said) belong to the same email address(bashar.said@vshn.ch)
 ```
 
-## Search for multiple emails
-
+* ## Search for multiple emails
 ```
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
     profile = hatchbuck.search_email_multi(['sgdhfgfdgh@fdvd.com', 'bashar.said@vshn.ch', ...])
@@ -149,24 +149,22 @@ $ python basharexample.py -c aarno.yaml -v
     $ python basharexample.py -c aarno.yaml -v
 ```
 
-**Note:** The emails must be in list form, and the search process stops getting the first match
-
+  **Note:** The emails must be in list form, and the search process stops getting the first match
 ### output
 
 ```
     2018-03-08 11:00:21,079 - hatchbuck - DEBUG - searching for {'emails': [{'address': 'sgdhfgfdgh@fdvd.com'}]}
     2018-03-08 11:00:21,091 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
     2018-03-08 11:00:21,857 - requests.packages.urllib3.connectionpool - DEBUG - "POST /api/v1/contact/search?
-    2018-03-08 11:00:21,860 - hatchbuck - DEBUG - not found
+    2018-03-08 11:00:21,860 - hatchbuck - DEBUG - **not found**
 ```
 
 #### We did not find a profile with an email address: 'sgdhfgfdgh@fdvd.com'
-
 ```
     2018-03-08 11:00:21,860 - hatchbuck - DEBUG - searching for {'emails': [{'address': 'bashar.said@vshn.ch'}]}
     2018-03-08 11:00:21,862 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
     2018-03-08 11:00:22,641 - requests.packages.urllib3.connectionpool - DEBUG - "POST /api/v1/contact/search?
-    2018-03-08 11:00:22,643 - hatchbuck - DEBUG - found: {......}
+    2018-03-08 11:00:22,643 - hatchbuck - DEBUG - **found**: {......}
 ```
 
 #### We found a profile with his email address: 'bashar.said@vshn.ch'  
@@ -177,10 +175,10 @@ $ python basharexample.py -c aarno.yaml -v
     We get the same results When we search by email address
 ```
 
-## Profile updated
-## Create profile
-## Add address to profile
-## profile contains
-## Add a profile
-## Add tags
-## Add birthday to profile
+* ## Profile updated
+* ## Create profile
+* ## Add address to profile
+* ## profile contains
+* ## Add a profile
+* ## Add tags
+* ## Add birthday to profile
