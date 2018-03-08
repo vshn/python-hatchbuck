@@ -125,7 +125,8 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 
 
-* ## Search for the Full name
+## Search for the Full name
+
  ```
 	hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 	profile = hatchbuck.search_name('bashar', 'said')
@@ -134,11 +135,13 @@ $ python basharexample.py -c aarno.yaml -v
  ```
 
 ### output
+
 ```
     We get the same results When we search by email address because the firstname and lastname(bashar, said) belong to the same email address(bashar.said@vshn.ch)
 ```
 
-* ## Search for multiple emails
+## Search for multiple emails
+
 ```
     hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
     profile = hatchbuck.search_email_multi(['sgdhfgfdgh@fdvd.com', 'bashar.said@vshn.ch', ...])
@@ -146,7 +149,8 @@ $ python basharexample.py -c aarno.yaml -v
     $ python basharexample.py -c aarno.yaml -v
 ```
 
-  **Note:** The emails must be in list form, and the search process stops getting the first match
+**Note:** The emails must be in list form, and the search process stops getting the first match
+
 ### output
 
 ```
@@ -157,6 +161,7 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 
 #### We did not find a profile with an email address: 'sgdhfgfdgh@fdvd.com'
+
 ```
     2018-03-08 11:00:21,860 - hatchbuck - DEBUG - searching for {'emails': [{'address': 'bashar.said@vshn.ch'}]}
     2018-03-08 11:00:21,862 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
@@ -172,10 +177,10 @@ $ python basharexample.py -c aarno.yaml -v
     We get the same results When we search by email address
 ```
 
-* ## Profile updated
-* ## Create profile
-* ## Add address to profile
-* ## profile contains
-* ## Add a profile
-* ## Add tags
-* ## Add birthday to profile
+## Profile updated
+## Create profile
+## Add address to profile
+## profile contains
+## Add a profile
+## Add tags
+## Add birthday to profile
