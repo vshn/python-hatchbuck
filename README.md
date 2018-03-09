@@ -173,8 +173,6 @@ $ python basharexample.py -c aarno.yaml -v
     We get the same results When we search by email address
 ```
 
-## Profile updated
-
 ## Create profile
 ```
 hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
@@ -228,7 +226,17 @@ $ python basharexample.py -c aarno.yaml -v
 ### output
 
 ```
-    {'addresses': [],
+    {'addresses': [ {
+    "street": "Langäcker 12",
+    "city": "wettingen",
+    "state": "AG",
+    "zip": "5430",
+    "country": "Schweiz",
+    "type": "work",
+    }],
+```
+
+```
     'campaigns': [],
     'company': 'HAWAR',
     'contactId': 'TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1',
@@ -256,7 +264,6 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 
 ```
-
     'phones': [{'id': 'MVhxaXBHdlRWOWdLX05FbHF6ZnczMERGVTMyWWRkZ0xsSFFQcXVNYW5NTTE1',
     'number': '0041 76 803 77 34',
     'type': 'Work',
@@ -264,7 +271,6 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 
 ```
-
     'referredBy': '',
     'salesRep': {'id': 'VGpwQTRGTmw4MExVODl1b1BmXzBodTBwWnZXS2dUZzVvSkJKZUx4UlFpdzE1',
     'username': 'aarno.aukia'},
@@ -278,7 +284,6 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 
 ```
-
     'status': {'id': 'UE9zMy1abnhnNUJQWnVORE5BQzNicUFWQ3huLXF2eGlSdlIyYVFmVXh4UTE1',
     'name': 'Employee'},
 
@@ -294,6 +299,73 @@ $ python basharexample.py -c aarno.yaml -v
     'website': []}
 
 ```
+## Profile updated
+
+#### For example, we want to update the address in the previous profile
+```
+hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
+profile = hatchbuck.update('TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1', {
+        "firstName": "Hawar",
+        "lastName": "Afrin",
+        "title": "Hawar1",
+        "company": "HAWAR",
+        "emails": [
+            {
+                "address": "bashar.said.2018@gmail.com",
+                "type": "work",
+            }
+        ],
+        "phones": [
+            {
+                "number": "0041 76 803 77 34",
+                "type": "work",
+            }
+        ],
+        "status": {
+            "name": "Employee",
+        },
+        "temperature": {
+            "name": "Hot",
+        },
+        "addresses": [
+            {
+             	"street": "Neugasse 10",
+                "city": "Zürich",
+                "state": "ZH",
+                "zip": "8005",
+                "country": "Switzerland",
+                "type": "work",
+            }
+        ],
+        #"subscribed": true,
+        "timezone": "W. Europe Standard Time",
+        "socialNetworks": [
+            {
+                "address": "'https://twitter.com/bashar_2018'",
+                "type": "Twitter",
+            }
+        ],
+    }
+)
+pp.pprint(profile)
+
+$ python basharexample.py -c aarno.yaml -v
+
+```
+### output
+
+```
+    {'addresses': [{'city': 'Zürich',
+    'country': 'Switzerland',
+    'countryId': 'QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1',
+    'id': 'OEFPUzJBeTdaWlVhU3FDR194dEk3NU8xTThxakZuQXV4aE9obHM3SVdKTTE1',
+    'state': 'ZH',
+    'street': 'Neugasse 10',
+    'type': 'Work',
+    'typeId': 'SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1',
+    'zip': '8005'}],
+```
+
 ## Add address to profile
 ## profile contains
 ## Add a profile
