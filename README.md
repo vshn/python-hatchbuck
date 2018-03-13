@@ -367,6 +367,44 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 
 ## Add address to profile
+```
+hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
+profile = hatchbuck.profile_add_address({
+    "contactId": "TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1"},
+    {'street':"Langäcker 13",
+     'zip_code':"5430",
+     'city':"Wettingen",
+     'country':"Switzerland"},
+    "Home"
+)
+pp.pprint(profile)
+
+$ python basharexample.py -c aarno.yaml -v
+
+```
+### output
+```
+{'addresses': [{'city': 'Wettingen',
+                'country': 'Switzerland',
+                'countryId': 'QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1',
+                'id': 'eDZNV2d4Q1ZIR09UN2p1UlhzclVCdTM0LU81UW5TZzZmU05vLUtuVzdoMDE1',
+                'state': '',
+                'street': 'Langäcker 13',
+                'type': 'Home',
+                'typeId': 'M1ZkLXI3UnJqUWxUVDNFZUZ3MW5MdG5KSGZuN0lVemNDcXNLdzgzbjBDVTE1',
+                'zip': '5430'},
+
+
+               {'city': 'Zürich',
+                'country': 'Switzerland',
+                'countryId': 'QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1',
+                'id': 'OEFPUzJBeTdaWlVhU3FDR194dEk3NU8xTThxakZuQXV4aE9obHM3SVdKTTE1',
+                'state': 'ZH',
+                'street': 'Neugasse 10',
+                'type': 'Work',
+                'typeId': 'SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1',
+                'zip': '8005'}
+```
 ## profile contains
 ```
 profile = hatchbuck.profile_contains({
@@ -420,6 +458,7 @@ True
 ## Add a profile
 ## Add tags
 ```
+hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 profile = hatchbuck.add_tag('TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1', 'new tag')
 pp.pprint(profile)
 
@@ -438,14 +477,43 @@ $ python basharexample.py -c aarno.yaml -v
 2018-03-13 09:55:51,517 - hatchbuck - DEBUG - adding tag new tag to contact TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1
 2018-03-13 09:55:51,533 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
 2018-03-13 09:55:52,216 - requests.packages.urllib3.connectionpool - DEBUG - "POST /api/v1/contact/TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1/Tags?api_key= '' HTTP/1.1" 201 14
-
+```
 **2018-03-13 09:55:52,220 - hatchbuck - DEBUG - success: "Tag(s) added"**
 
 
-**Notice the addition of a crown when viewing the profile**
+**Notice the addition of a tag when viewing the profile**
+```
 'tags': [{'id': 'Y0Y4VFRhbDZSZFl2eENuYWU4M2s4Q3FsNjExTk5ldjdVOFdWU29ZRy1UTTE1',
            'name': 'new tag',
            'score': 1}],
 ```
 
 ## Add birthday to profile
+
+```
+hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
+
+profile = hatchbuck.profile_add_birthday({
+    "contactId": "TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1"
+    },
+
+    {'month': '1', 'day': '1', 'year': '1984'}
+)
+pp.pprint(profile)
+
+$ python basharexample.py -c aarno.yaml -v
+
+```
+### output
+```
+'customFields': [{'name': 'Comments', 'type': 'MText', 'value': ''},
+                 {'name': 'Invoiced', 'type': 'Number', 'value': ''},
+                 {'name': 'Language', 'type': 'Text', 'value': ''},
+                 {'name': 'working at company since',
+                   'type': 'Text',
+                   'value': ''},
+                 {'name': 'company size', 'type': 'Text', 'value': ''},
+                 {'name': 'Birthday', 'type': 'Date', 'value': '1/1/1984'}],
+
+```
+
