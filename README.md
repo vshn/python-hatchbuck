@@ -301,7 +301,7 @@ $ python basharexample.py -c aarno.yaml -v
 ```
 ## Profile updated
 
-#### For example, we want to update the address in the previous profile
+#### For example, we want to update the addresses in the previous profile
 ```
 hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
 profile = hatchbuck.update('TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1', {
@@ -368,6 +368,84 @@ $ python basharexample.py -c aarno.yaml -v
 
 ## Add address to profile
 ## profile contains
+```
+profile = hatchbuck.profile_contains({
+    "contactId": "QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1",
+    "firstName": "Hawar",
+    "lastName": "Afrin",
+    "title": "Hawar1",
+    "company": "HAWAR",
+    "emails": [
+      {
+        "address": "bashar.said.2018@gmail.com",
+        "type": "work",
+      }
+    ],
+    "addresses": [
+            {
+                "street": "Neugasse 10",
+                "city": "Zürich",
+                "state": "ZH",
+                "zip": "8005",
+                "country": "Switzerland",
+                "type": "work",
+            }
+        ],
+    "phones": [
+            {
+                "number": "0041 76 803 77 34",
+                "type": "work",
+            }
+        ]
+
+
+  }, "phones", "number", "0041 76 803 77 34")
+
+pp.pprint(profile)
+
+$ python basharexample.py -c aarno.yaml -v
+
+```
+### output
+```
+2018-03-13 09:21:23,556 - root - DEBUG - loading config file: aarno.yaml
+2018-03-13 09:21:23,559 - root - DEBUG - loaded config: {'app_key': ' ', 'app_secret': ' ',
+'hatchbuck_key': ' ', 'hatchbuck_source_xing': ' ', 'hatchbuck_source_linkedin': ' ',
+'hatchbuck_source_carddav': ' ', 'hatchbuck_tag_xing': 'Xing-aarno', 'hatchbuck_tag_linkedin': 'LinkedIn-aarno',
+'hatchbuck_tag_carddav': 'Adressbuch-aarno', 'user_key': ' ', 'user_secret': ' ', 'carddav_path': 'carddav/360afdfd542ea44f/'}
+
+True
+
+```
 ## Add a profile
 ## Add tags
+```
+profile = hatchbuck.add_tag('TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1', 'new tag')
+pp.pprint(profile)
+
+$ python basharexample.py -c aarno.yaml -v
+
+```
+### output
+
+```
+2018-03-13 09:55:51,514 - root - DEBUG - starting with arguments: Namespace(config='aarno.yaml', noop=False, verbose=True)
+2018-03-13 09:55:51,514 - root - DEBUG - loading config file: aarno.yaml
+2018-03-13 09:55:51,517 - root - DEBUG - loaded config: {'app_key': ' ', 'app_secret': ' ', 'hatchbuck_key': ' ', 'hatchbuck_source_xing': ' ',
+'hatchbuck_source_linkedin': ' ', 'hatchbuck_source_carddav': ' ', 'hatchbuck_tag_xing': 'Xing-aarno', 'hatchbuck_tag_linkedin': 'LinkedIn-aarno',
+'hatchbuck_tag_carddav': 'Adressbuch-aarno', 'user_key': ' ', 'user_secret': ' ', 'carddav_path': 'carddav/360afdfd542ea44f/'}
+
+2018-03-13 09:55:51,517 - hatchbuck - DEBUG - adding tag new tag to contact TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1
+2018-03-13 09:55:51,533 - requests.packages.urllib3.connectionpool - INFO - Starting new HTTPS connection (1): api.hatchbuck.com
+2018-03-13 09:55:52,216 - requests.packages.urllib3.connectionpool - DEBUG - "POST /api/v1/contact/TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1/Tags?api_key= '' HTTP/1.1" 201 14
+
+**2018-03-13 09:55:52,220 - hatchbuck - DEBUG - success: "Tag(s) added"**
+
+
+**Notice the addition of a crown when viewing the profile**
+'tags': [{'id': 'Y0Y4VFRhbDZSZFl2eENuYWU4M2s4Q3FsNjExTk5ldjdVOFdWU29ZRy1UTTE1',
+           'name': 'new tag',
+           'score': 1}],
+```
+
 ## Add birthday to profile
