@@ -456,6 +456,48 @@ True
 
 ```
 ## Add a profile
+```
+hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
+profile = hatchbuck.profile_add({"contactId": "TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1"},
+"emails", "address", "baschar.said@hotmail.com", {'type': 'Home'})
+pp.pprint(profile)
+
+$ python basharexample.py -c aarno.yaml -v
+
+```
+### output
+```
+{'addresses': [],
+ 'campaigns': [],
+ 'contactId': 'cFk2SXB1emNXWFFuRGRPWnNCeGsyRUZ1NmxCeVdFZlJkV3lzdWVKN0dpZzE1',
+ 'customFields': [{'name': 'Comments', 'type': 'MText', 'value': ''},
+                  {'name': 'Invoiced', 'type': 'Number', 'value': ''},
+                  {'name': 'Language', 'type': 'Text', 'value': ''},
+                  {'name': 'working at company since',
+                   'type': 'Text',
+                   'value': ''},
+                  {'name': 'company size', 'type': 'Text', 'value': ''},
+                  {'name': 'Birthday', 'type': 'Date', 'value': ''}],
+ 'emails': [{'address': 'baschar.said@hotmail.com',
+             'id': 'SVJhdUZDUjZNcllHYVRnZW5XWVZub1kzYmdIRTNkUmpwbUllYlJPNkxKazE1',
+             'type': 'Work',
+             'typeId': 'VmhlQU1pZVJSUFFJSjZfMHRmT1laUmwtT0FMNW9hbnBuZHd2Q1JTdE0tYzE1'}],
+ 'firstName': '',
+ 'instantMessaging': [],
+ 'lastName': '',
+ 'phones': [],
+ 'referredBy': '',
+ 'salesRep': {'id': 'VGpwQTRGTmw4MExVODl1b1BmXzBodTBwWnZXS2dUZzVvSkJKZUx4UlFpdzE1',
+              'username': 'aarno.aukia'},
+ 'socialNetworks': [],
+ 'status': {'id': 'UHQ4aTZUTXh2aDROQ0w0Z2dOSDlGM2ZkaXFRelhTLTJEVHNKWU02TXJ1bzE1',
+            'name': 'Customer Opportunity'},
+ 'subscribed': True,
+ 'tags': [],
+ 'timezone': 'W. Europe Standard Time',
+ 'website': []}
+```
+
 ## Add tags
 ```
 hatchbuck = Hatchbuck(config['hatchbuck_key'],noop=args.noop)
