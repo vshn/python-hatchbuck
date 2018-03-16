@@ -127,10 +127,11 @@ class Hatchbuck():
 
     def profile_add_address(self, profile, address, addresstype):
         """
-        :param profile:
-        :param address:
-        :param addresstype:
-        :return:
+        :param profile: The profile we want to add the address to
+        :param address: The address we want to add
+        :param addresstype: The type of address we want to add
+        :return: Return the profile after adding the address to it
+
         """
         try:
             country = countries.get(alpha2=address['country']).name
