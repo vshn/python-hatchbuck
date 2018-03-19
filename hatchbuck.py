@@ -221,7 +221,7 @@ class Hatchbuck():
         :param attributename: The name of the attribute we're looking for to add or edit
         :param valuelist: The valus of the attribute
         :param moreattributes: More attributes that we want to add or modify
-        :return:
+        :return: Return profile after adding or editing fields
         """
         # add a certain email/phone/website field to the hatchbuck contact profile if it's not there already
         # the hatchbuck profile is built up like:
