@@ -524,8 +524,6 @@ profile = hatchbuck.profile_add_birthday({
 )
 pp.pprint(profile)
 
-$ python basharexample.py -c aarno.yaml -v
-
 ```
 ### output
 ```
