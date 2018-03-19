@@ -215,11 +215,12 @@ class Hatchbuck():
 
     def profile_add(self, profile, dictname, attributename, valuelist, moreattributes={}):
         """
-        :param profile:
-        :param dictname:
-        :param attributename:
-        :param valuelist:
-        :param moreattributes:
+        Add a new field to the profile if it does not exist, or update the field if it exists
+        :param profile: The profile we want to add or modify fields
+        :param dictname: The name of the field we're looking for to add or edit
+        :param attributename: The name of the attribute we're looking for to add or edit
+        :param valuelist: The valus of the attribute
+        :param moreattributes: More attributes that we want to add or modify
         :return:
         """
         # add a certain email/phone/website field to the hatchbuck contact profile if it's not there already
