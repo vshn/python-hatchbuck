@@ -95,7 +95,7 @@ pp.pprint(profile)
 
 ```
 
-## Search for the Full name
+## Search for the first and last name
 
  ```python
 from hatchbuck import Hatchbuck
