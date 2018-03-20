@@ -215,7 +215,7 @@ class Hatchbuck():
 
     def profile_add(self, profile, dictname, attributename, valuelist, moreattributes={}):
         """
-        Add a new field to the profile if it does not exist, or update the field if it exists
+        Add a new fields to the profile if it does not exist, or update the field if it exists
         :param profile: The profile we want to add or modify fields
         :param dictname: The name of the field we're looking for to add or edit
         :param attributename: The name of the attribute we're looking for to add or edit

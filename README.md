@@ -111,7 +111,7 @@ pp.pprint(profile)
 We get the same results When we search by email address because the firstname and lastname(bashar, said) belong to the same email address(bashar.said@vshn.ch)
 ```
 
-## Search for multiple emails
+## Search for an email address within a list of addresses
 ```python
 from hatchbuck import Hatchbuck
 import pprint
