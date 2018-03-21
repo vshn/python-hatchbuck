@@ -8,8 +8,9 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='hatchbuck',
-      version='1.0.0',
+      version='1.0.1',
       description='Hatchbuck.com CRM API bindings for python',
+      long_description=long_description,
       long_description_content_type='text/markdown',
       keywords='hatchbuck CRM API',
       url='https://github.com/vshn/hatchbuck',
