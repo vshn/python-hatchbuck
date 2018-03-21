@@ -13,7 +13,7 @@ setup(name='hatchbuck',
       long_description=long_description,
       long_description_content_type='text/markdown',
       keywords='hatchbuck CRM API',
-      url='https://github.com/vshn/pytho-hatchbuck',
+      url='https://github.com/vshn/python-hatchbuck',
       author='VSHN AG, Bashar Said',
       author_email='bashar.said@vshn.ch',
       # BSD 3-Clause License:
