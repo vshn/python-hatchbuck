@@ -383,6 +383,7 @@ Add address to profile
 
 output
 ---------
+.. code::
 
     {'addresses': [{'city': 'Wettingen',
                 'country': 'Switzerland',
