@@ -13,7 +13,7 @@ The easiest way to install hatchbuck is with pip
 Basic Usage
 ------------
 
-.. code-block::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -102,7 +102,7 @@ output
 
 Search for the first and last name
 ------------------------------------
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -114,14 +114,14 @@ Search for the first and last name
 
 output
 -------
-.. code-block::
+.. code::
 
     We get the same results When we search by email address because the firstname and lastname(bashar, said) belong to the         same email address(bashar.said@vshn.ch)
 
 
 Search within a list of email addresses
 ----------------------------------------
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -135,47 +135,11 @@ Search within a list of email addresses
 
 output
 -------
+**We found a profile with his email address: 'bashar.said@vshn.ch'**
 
 .. code::
 
    {'addresses': [{'city': 'Zürich',
-                'country': 'Switzerland',
-                'countryId': 'QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1',
-                'id': 'Q0NjajF2U1lTWnBHM1hjRFlnQzhzMHZ2UUxLY2d6a1JaU3Nicm5hRTN6azE1',
-                'state': 'ZH',
-                'street': 'Neugasse 10',
-                'type': 'Work',
-                'typeId': 'SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1',
-                'zip': '8005'}],
- 'campaigns': [],
- 'company': 'VSHN AG',
- 'contactId': 'SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1',
- 'customFields': [{'name': 'Comments', 'type': 'MText', 'value': ''},
-                  {'name': 'Invoiced', 'type': 'Number', 'value': ''},
-                  {'name': 'Language', 'type': 'Text', 'value': ''},
-                  {'name': 'working at company since',
-                   'type': 'Text',
-                   'value': '1.1.2018'},
-                  {'name': 'company size', 'type': 'Text', 'value': '25'},
-                  {'name': 'Birthday', 'type': 'Date', 'value': ''}],
- 'emails': [{'address': 'bashar.said@vshn.ch',
-             'id': 'S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1',
-             'type': 'Work',
-             'typeId': 'VmhlQU1pZVJSUFFJSjZfMHRmT1laUmwtT0FMNW9hbnBuZHd2Q1JTdE0tYzE1'}],
- 'firstName': 'Bashar',
- 'instantMessaging': [],
- 'lastName': 'Said',
- 'phones': [{'id': 'OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4TVppZlF4NklrNmZfSnBhaDZwQTE1',
-             'number': '+(414) 454-5 53 00',
-             'type': 'Work',
-             'typeId': 'QTBncHV0dndnaGNnRVMzLTR0SGtFRmRvZjdqNm4zcVphQi1XX1Z2MXVtRTE1'}],
- 'referredBy': '',
- 'salesRep': {'id': 'VGpwQTRGTmw4MExVODl1b1BmXzBodTBwWnZXS2dUZzVvSkJKZUx4UlFpdzE1',
-              'username': 'aarno.aukia'},
- 'socialNetworks': [{'address': 'https://twitter.com/bashar_2018',
-                     'id': 'S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg5Z3piMERVbEFsam42azE1',
-(virtualenv) Meetingroom:examples Bashar$ python search_multiple_email_addresses.py
-{'addresses': [{'city': 'Zürich',
                 'country': 'Switzerland',
                 'countryId': 'QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1',
                 'id': 'Q0NjajF2U1lTWnBHM1hjRFlnQzhzMHZ2UUxLY2d6a1JaU3Nicm5hRTN6azE1',
@@ -231,12 +195,12 @@ output
               'websiteUrl': 'https://vshn.ch'}]}
 
 
+
 **We did not find a profile with an email address: 'sgdhfgfdgh@fdvd.com'**
-**We found a profile with his email address: 'bashar.said@vshn.ch'**
 
 Create profile
 ----------------
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -366,7 +330,7 @@ Profile updated
 
 **For example, we want to update the addresses in the previous profile**
 
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -436,7 +400,7 @@ output
 Add address to profile
 ------------------------
 
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -480,7 +444,7 @@ output
 
 profile contains
 ------------------
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -537,7 +501,7 @@ output
 
 Add a profile
 ---------------
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -584,7 +548,7 @@ output
 
 Add tags
 ----------
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
@@ -622,7 +586,7 @@ output
 Add birthday to profile
 --------------------------
 
-.. code::
+.. code:: python
 
     from hatchbuck import Hatchbuck
     import pprint
