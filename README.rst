@@ -22,7 +22,7 @@ Basic Usage
     profile = hatchbuck.search_email('bashar.said@vshn.ch')
     pp.pprint(profile)
 
-You can get your Hatchbuck API key at https://app.hatchbuck.com/Account/UpdateAPIKey when logged in
+You can get your Hatchbuck API key at https://app.hatchbuck.com/account/setting#WebAPI when logged in
 
 Examples
 ---------
