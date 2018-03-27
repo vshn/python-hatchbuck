@@ -41,7 +41,7 @@ Search for one email address
 
 output
 --------
-.. code::
+.. code:: python
 
     {'addresses': [{'city': 'Zürich',
                 'country': 'Switzerland',
