@@ -79,6 +79,13 @@ class TestHatchbuck(unittest.TestCase):
         profile2 = hatchbuck.add_tag('SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1', '')
         self.assertFalse(profile2, testProfile)
 
+    def test_profile_add_birthday(self):
+        hatchbuck = Hatchbuck('abc123')
+        profile3 = hatchbuck.profile_add_birthday({
+            "contactId": "TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1"},
+            {'month': '1', 'day': '1', 'year': '1984'})
+        self.assertTrue(profile3, testProfile)
+
 
 if __name__ == '__main__':
     unittest.main()
