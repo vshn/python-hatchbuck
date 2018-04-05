@@ -576,6 +576,7 @@ output
 
 
 **Notice**:  the addition of a tag when viewing the profile
+
 .. code::
 
     'tags': [{'id': 'Y0Y4VFRhbDZSZFl2eENuYWU4M2s4Q3FsNjExTk5ldjdVOFdWU29ZRy1UTTE1',
