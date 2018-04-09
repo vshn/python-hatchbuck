@@ -38,7 +38,6 @@ profile = hatchbuck.update('TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFC
             "type": "work",
         }
     ],
-    #"subscribed": true,
     "timezone": "W. Europe Standard Time",
     "socialNetworks": [
         {

@@ -133,11 +133,13 @@ class Hatchbuck():
         :return: Return the profile after adding the address to it
 
         """
+        # try to convert the country name from a two-letter abbreviation
         try:
             country = countries.get(alpha2=address['country']).name
         except:
             country = address['country']
 
+        # convert the dict field names to hatchbuck names
         update = {
             'street': address['street'],
             'zip': address['zip_code'],
@@ -157,17 +159,7 @@ class Hatchbuck():
         if 'addresses' not in profile:
             profile['addresses'] = []
 
-        addressfound = False
-        for item in profile['addresses']:
-            thisisit = True
-            for key in update:
-                if not (item[key] == update[key] or (item[key] == "" and update[key] == None)):
-                    thisisit = False
-            if thisisit:
-                # all fields matched
-                addressfound = True
-                break
-        if not addressfound:
+        if not self.address_exists(profile, update):
             updated = self.update(profile['contactId'],{'addresses': [update]})
             if updated == None:
                 # update failed or noope'd
@@ -176,6 +168,17 @@ class Hatchbuck():
                 return updated
 
         return profile
+
+    def address_exists(self, profile, address):
+        for item in profile['addresses']:
+            thisisit = True
+            for key in address:
+                if not (item[key] == address[key] or (item[key] == "" and address[key] == None)):
+                    thisisit = False
+            if thisisit:
+                # all fields matched
+                return True
+        return False
 
     def profile_contains(self, profile, dictname, attributename, value):
         """
@@ -219,7 +222,7 @@ class Hatchbuck():
         :param profile: The profile we want to add or modify fields
         :param dictname: The name of the field we're looking for to add or edit
         :param attributename: The name of the attribute we're looking for to add or edit
-        :param valuelist: The valus of the attribute
+        :param valuelist: The values of the attribute
         :param moreattributes: More attributes that we want to add or modify
         :return: Return profile after adding or editing fields
         """

@@ -49,20 +49,73 @@ class TestHatchbuck(unittest.TestCase):
 
     def test_profile_add_address(self):
         hatchbuck = Hatchbuck('abc123')
-        profile = hatchbuck.profile_add_address({
-            "contactId": "SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1"},
-            {'street': "Neugasse 10",
+        existingaddress = {'street': "Neugasse 10",
              'zip_code': "8005",
              'city': "Zürich",
-             'country': "Switzerland"},
-            "Work"
+             'country': "Switzerland"}
+        # We're trying to add an address that is already there
+        # Check that the address is there already
+        self.assertTrue(hatchbuck.address_exists(testProfile, {
+            'street': existingaddress['street'],
+            'zip': existingaddress['zip_code'],
+            'city': existingaddress['city'],
+            'country': existingaddress['country'],
+            'type': 'Work',
+        }))
+
+        # try to add the address again
+        profile = hatchbuck.profile_add_address(testProfile,
+                                                existingaddress,
+                                                "Work"
         )
-        self.assertTrue(profile, testProfile)
+
+        # Check that the address is still there
+        self.assertTrue(hatchbuck.address_exists(profile, {
+            'street': existingaddress['street'],
+            'zip': existingaddress['zip_code'],
+            'city': existingaddress['city'],
+            'country': existingaddress['country'],
+            'type': 'Work',
+        }))
+
+        # check that the profile was not modified by trying to add an existing address
+        self.assertTrue(profile == testProfile)
+
+        # We can't test adding an address offline
+        # # adding a new address
+        # newaddress = {'street': "Bahnhofstrasse 1",
+        #      'zip_code': "8001",
+        #      'city': "Zürich",
+        #      'country': "Switzerland"}
+        #
+        # self.assertFalse(hatchbuck.address_exists(profile, {
+        #     'street': newaddress['street'],
+        #     'zip': newaddress['zip_code'],
+        #     'city': newaddress['city'],
+        #     'country': newaddress['country'],
+        #     'type': 'Home',
+        # }))
+        #
+        # profile = hatchbuck.profile_add_address(testProfile,
+        #                                         newaddress,
+        #                                         "Home"
+        # )
+        # print(len(profile['addresses']))
+        # print(profile)
+        # self.assertTrue(len(profile['addresses']) == 2)
+        #
+        # self.assertTrue(hatchbuck.address_exists(profile, {
+        #     'street': newaddress['street'],
+        #     'zip': newaddress['zip_code'],
+        #     'city': newaddress['city'],
+        #     'country': newaddress['country'],
+        #     'type': 'Home',
+        # }))
 
 
     def test_profile_contains(self):
         hatchbuck = Hatchbuck('abc123')
-        profile1 = hatchbuck.profile_contains({
+        profile = hatchbuck.profile_contains({
             "contactId": "SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1",
             "phones": [
                 {
@@ -71,20 +124,20 @@ class TestHatchbuck(unittest.TestCase):
                 }
             ]
         }, "phones", "number", "+(414) 454-5 53 00")
-        self.assertTrue(profile1, testProfile)
+        self.assertTrue(profile, testProfile)
 
 
     def test_add_tag(self):
         hatchbuck = Hatchbuck('abc123')
-        profile2 = hatchbuck.add_tag('SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1', '')
-        self.assertFalse(profile2, testProfile)
+        profile = hatchbuck.add_tag('SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1', '')
+        self.assertFalse(profile, testProfile)
 
     def test_profile_add_birthday(self):
         hatchbuck = Hatchbuck('abc123')
-        profile3 = hatchbuck.profile_add_birthday({
+        profile = hatchbuck.profile_add_birthday({
             "contactId": "TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1"},
             {'month': '1', 'day': '1', 'year': '1984'})
-        self.assertTrue(profile3, testProfile)
+        self.assertTrue(profile, testProfile)
 
 
 if __name__ == '__main__':
