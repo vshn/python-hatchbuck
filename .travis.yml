@@ -6,12 +6,12 @@ python:
 # Requirements for running the package
 install: pip install -r requirements.txt
 
-script: python setup.py test
-#script:
-#  - python tests/test_basic.py
-#  - python tests/test_functions.py
+#script: python setup.py test
+script:
+  - python tests/test_basic.py
+  - python tests/test_functions.py
 
-#branches:
-#    only:
-#        - master
+branches:
+    only:
+       - master
 
