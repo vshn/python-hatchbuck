@@ -1,4 +1,7 @@
 .. image:: https://travis-ci.org/vshn/python-hatchbuck.svg?branch=master
+  :target: https://travis-ci.org/vshn/python-hatchbuck
+
+This package is compatible with Python 3.5 and 3.6
 
 Hatchbuck.com CRM API bindings for python
 ===========================================
