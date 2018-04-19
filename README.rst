@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/vshn/python-hatchbuck.svg?branch=master)](https://travis-ci.org/vshn/python-hatchbuck)
+.. image:: https://travis-ci.org/vshn/python-hatchbuck.svg?branch=master
 
 Hatchbuck.com CRM API bindings for python
 ===========================================
