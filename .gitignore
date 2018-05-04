@@ -10,10 +10,12 @@ __pycache__/
 /virtualenv/
 
 # packaging
-/crmngr.egg-info/
+/hatchbuck.egg-info/
 /dist/
 /build/
 
 # testing
 /.cache/
 /pytestdebug.log
+/.pytest_cache/
+/.tox/
