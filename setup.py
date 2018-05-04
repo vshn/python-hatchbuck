@@ -15,14 +15,18 @@ setup(name='hatchbuck',
       version=__version__,
       description='Hatchbuck.com CRM API bindings for Python',
       long_description=read_file('README.rst'),
-      keywords='hatchbuck CRM API',
+      keywords=['hatchbuck', 'CRM', 'API'],
+      classifiers=[
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: BSD License',
+          'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
+      ],
       url='https://github.com/vshn/python-hatchbuck',
       author='VSHN AG, Bashar Said',
       author_email='bashar.said@vshn.ch',
-      # BSD 3-Clause License:
-      # - http://opensource.org/licenses/BSD-3-Clause
       license='BSD',
-      py_modules=["hatchbuck"],
+      py_modules=['hatchbuck'],
       install_requires=[
           'requests>=2',
           'pycountry>=1',
