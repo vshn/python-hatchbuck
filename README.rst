@@ -14,8 +14,8 @@ This python package provides an easy to use python module to interact with the
    :alt: Build status
    :target: https://travis-ci.org/vshn/python-hatchbuck
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/hatchbuck.svg
-   :target: https://pypi.org/project/hatchbuck
    :alt: Python versions
+   :target: https://pypi.org/project/hatchbuck
 .. |license| image:: https://img.shields.io/pypi/l/hatchbuck.svg
    :alt: Software license
    :target: https://github.com/vshn/python-hatchbuck/blob/master/LICENSE
