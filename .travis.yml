@@ -1,22 +1,14 @@
 language: python
 python:
-#  - "2.7"
-  - "3.5"
-  - "3.6"
-
-before_install:
-  - "pip install -U pip"
-  - "export PYTHONPATH=$PYTHONPATH:$(pwd)"
-
-# Requirements for running the package
-install: pip install -r requirements.txt
-
-#script: python setup.py test
-script:
-  - python tests/test_basic.py
-  - python tests/test_functions.py
-
+  - '3.5'
+  - '3.6'
+install: pip install tox
+script: tox
 branches:
-    only:
-       - master
-
+  only:
+  - master
+deploy:
+  provider: pypi
+  user: Bashar.said
+  password:
+    secure: XI9Z/ZvE+V0OxFTE96bl9c0zTn+n5tA62ul4Lv3j++HraCfe3IFy7nBdSsxHeU0m1qckL2uGZ5qMbrj2pakMtnt2QZJGX2KyFv9W6TDXwXVnfY/Jnvir0Hvm2MRSoglDShS1yOF/W7sZhaLaXlCySSWJAi5C6eBDcDMODkFK1lHOuB3gZGZrfHOqNIcSk9pxU5bsvug6k6q5oh4Qwe9QVh3nvlheENdZXOsjz2X7OP3UcILaXRLCS7GZc9skvYVMXoJk5Mjq7I2SyoMNU2294sN4fLV0JnEHcQTBuOCtocJHR+9ikDFKHv39/0Rv5a96Cko7vyC3PYhzg2238QbjpFO0HwzD6H0ZDKO/zhJmdAdfgZK948akrJSRr2qLJuXgUByWW0pSOQdFqLwxsgr/ZwwjgEqxk0ci8ShyYxGcacPTZ6uQqVKiMS2U6IRbzJOnFZxPLhULNWOWVWyAJndAww2cNz29Rgne3UwHGI2h4Dx3Rf9AVAQbe3+uSftXDSr4W6KhLPLNavh/vrpLm2uIecuglL1IL1a3kWXwhNIQSTi/PsULWkvKcn1pgyjkq+oGsoqlarMQl41plX8C+CbXXhUjMotCrcDSqCZMw8dR/RY68szYN4mMx3G51DRFg8vcUAOJRvqNsM4ND8klClez1Uj0Atx6ycEaf1in39XTfHE=
