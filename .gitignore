@@ -1,6 +1,5 @@
-# pycharm
-/.idea/tasks.xml
-/.idea/workspace.xml
+# IDEs & editors
+/.idea/
 
 # cache
 *.py[cod]

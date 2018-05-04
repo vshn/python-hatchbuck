@@ -1,14 +1,30 @@
-.. image:: https://travis-ci.org/vshn/python-hatchbuck.svg?branch=master
-  :target: https://travis-ci.org/vshn/python-hatchbuck
+==========================================================
+Hatchbuck.com CRM API bindings for Python |latest-version|
+==========================================================
 
-This package is compatible with Python 3.5 and 3.6
+|build-status| |python-support| |license|
 
-Hatchbuck.com CRM API bindings for python
-===========================================
-This python package provides an easy to use python module to interact with the `hatchbuck.com API <https://hatchbuck.freshdesk.com/support/solutions/articles/5000578765-hatchbuck-api-documentation-for-advanced-users>`_
+This python package provides an easy to use python module to interact with the
+`hatchbuck.com API`_.
+
+.. |latest-version| image:: https://img.shields.io/pypi/v/hatchbuck.svg
+   :alt: Latest version on PyPI
+   :target: https://pypi.org/project/hatchbuck
+.. |build-status| image:: https://img.shields.io/travis/vshn/python-hatchbuck/master.svg
+   :alt: Build status
+   :target: https://travis-ci.org/vshn/python-hatchbuck
+.. |python-support| image:: https://img.shields.io/pypi/pyversions/hatchbuck.svg
+   :target: https://pypi.org/project/hatchbuck
+   :alt: Python versions
+.. |license| image:: https://img.shields.io/pypi/l/hatchbuck.svg
+   :alt: Software license
+   :target: https://github.com/vshn/python-hatchbuck/blob/master/LICENSE
+.. _hatchbuck.com API:
+    https://hatchbuck.freshdesk.com/support/solutions/articles/5000578765-hatchbuck-api-documentation-for-advanced-users
 
 Installation
---------------
+============
+
 The easiest way to install hatchbuck is with pip
 
 .. code::
@@ -16,7 +32,7 @@ The easiest way to install hatchbuck is with pip
     $ pip install hatchbuck
 
 Basic Usage
-------------
+===========
 
 .. code:: python
 
@@ -30,7 +46,8 @@ Basic Usage
 You can get your Hatchbuck API key at https://app.hatchbuck.com/account/setting#WebAPI when logged in
 
 Examples
----------
+========
+
 Search for one email address
 -----------------------------
 
@@ -43,9 +60,9 @@ Search for one email address
     profile = hatchbuck.search_email('bashar.said@vshn.ch')
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-output
---------
 .. code:: python
 
     {'addresses': [{'city': 'Zürich',
@@ -103,10 +120,9 @@ output
  'website': [{'id': 'bktodFBCalVCU2J6aFhjaXc5UVZkUHM5OHFnd0ZuQmdJTTU0cDRScm1KSTE1',
               'websiteUrl': 'https://vshn.ch'}]}
 
-
-
 Search for the first and last name
-------------------------------------
+----------------------------------
+
 .. code:: python
 
     from hatchbuck import Hatchbuck
@@ -116,16 +132,16 @@ Search for the first and last name
     profile = hatchbuck.search_name('bashar', 'said')
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-output
--------
 .. code::
 
     We get the same results When we search by email address because the firstname and lastname(bashar, said) belong to the         same email address(bashar.said@vshn.ch)
 
-
 Search within a list of email addresses
 ----------------------------------------
+
 .. code:: python
 
     from hatchbuck import Hatchbuck
@@ -138,11 +154,12 @@ Search within a list of email addresses
 
 **Note:** The emails must be in list form, and the search process stops getting the first match
 
-output
--------
+Output
+^^^^^^
+
 **We found a profile with his email address: 'bashar.said@vshn.ch'**
 
-.. code::
+.. code:: python
 
    {'addresses': [{'city': 'Zürich',
                 'country': 'Switzerland',
@@ -200,11 +217,11 @@ output
               'websiteUrl': 'https://vshn.ch'}]}
 
 
-
 **We did not find a profile with an email address: 'sgdhfgfdgh@fdvd.com'**
 
 Create profile
-----------------
+--------------
+
 .. code:: python
 
     from hatchbuck import Hatchbuck
@@ -254,10 +271,10 @@ Create profile
     })
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-output
--------
-.. code::
+.. code:: python
 
    {'addresses': [{'city': 'Wettingen',
                 'country': 'Switzerland',
@@ -329,9 +346,8 @@ output
              {'id': 'eG91X0tVcWU2a1A3dVg1b2JKQ1MyWGwzaGFjX1Q5RGRSNng3OE9XbGxBNDE1',
               'websiteUrl': 'http://002.powercoders.org/students/alan-omar/index.html'}]}
 
-
 Profile updated
------------------
+---------------
 
 **For example, we want to update the addresses in the previous profile**
 
@@ -386,9 +402,9 @@ Profile updated
     )
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-output
--------
 .. code::
 
     'addresses': [{'city': 'Zürich',
@@ -401,9 +417,8 @@ output
     			'typeId': 'SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1',
     			'zip': '8005'}],
 
-
 Add address to profile
-------------------------
+----------------------
 
 .. code:: python
 
@@ -422,9 +437,10 @@ Add address to profile
     pp.pprint(profile)
 
 
-output
----------
-.. code::
+Output
+^^^^^^
+
+.. code:: python
 
     {'addresses': [{'city': 'Wettingen',
                 'country': 'Switzerland',
@@ -447,8 +463,9 @@ output
                 'typeId': 'SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1',
                 'zip': '8005'}
 
-profile contains
-------------------
+Profile contains
+----------------
+
 .. code:: python
 
     from hatchbuck import Hatchbuck
@@ -489,10 +506,9 @@ profile contains
 
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-
-output
--------
 .. code::
 
     2018-03-13 09:21:23,556 - root - DEBUG - loading config file: aarno.yaml
@@ -503,9 +519,9 @@ output
 
     True
 
-
 Add a profile
----------------
+-------------
+
 .. code:: python
 
     from hatchbuck import Hatchbuck
@@ -515,10 +531,10 @@ Add a profile
     profile = hatchbuck.profile_add("emails", "address", "baschar.said@hotmail.com", {'type': 'Home'})
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-output
--------
-.. code::
+.. code:: python
 
  {'addresses': [],
  'campaigns': [],
@@ -550,9 +566,9 @@ output
  'timezone': 'W. Europe Standard Time',
  'website': []}
 
-
 Add tags
-----------
+--------
+
 .. code:: python
 
     from hatchbuck import Hatchbuck
@@ -562,9 +578,9 @@ Add tags
     profile =hatchbuck.add_tag('TmpmT0QyUGE3UGdGejZMay1xbDNyUHJFWU91M2VwN0hCdGtZZFFCaWRZczE1', 'new tag')
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-output
---------
 .. code::
 
     2018-03-13 09:55:51,514 - root - DEBUG - starting with arguments: Namespace(config='aarno.yaml', noop=False,     verbose=True)
@@ -588,9 +604,8 @@ output
            'name': 'new tag',
            'score': 1}],
 
-
 Add birthday to profile
---------------------------
+-----------------------
 
 .. code:: python
 
@@ -603,9 +618,9 @@ Add birthday to profile
     {'month': '1', 'day': '1', 'year': '1984'})
     pp.pprint(profile)
 
+Output
+^^^^^^
 
-output
--------
 .. code::
 
     'customFields': [{'name': 'Comments', 'type': 'MText', 'value': ''},
@@ -616,4 +631,3 @@ output
                    'value': ''},
                  {'name': 'company size', 'type': 'Text', 'value': ''},
                  {'name': 'Birthday', 'type': 'Date', 'value': '1/1/1984'}],
-
