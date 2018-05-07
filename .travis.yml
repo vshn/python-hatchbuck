@@ -18,8 +18,6 @@ jobs:
   include:
     - { stage: lint, python: 3.5, env: TOXENV=flake8 }
     - { stage: lint, python: 3.6, env: TOXENV=flake8 }
-    - { stage: lint, python: 3.5, env: TOXENV=pylint }
-    - { stage: lint, python: 3.6, env: TOXENV=pylint }
     - stage: deploy
       script: skip
       deploy:
