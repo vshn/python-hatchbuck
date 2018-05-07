@@ -179,6 +179,10 @@ class Hatchbuck():
         for item in profile['addresses']:
             thisisit = True
             for key in address:
+                if key == "country" and not item.get('country', False):
+                    # handle hatchbuck API not returning 'country' but 'countryid'
+                    # by ignoring country if it does not exist in the profile
+                    continue
                 if not (item[key] == address[key] or (
                         item[key] == "" and address[key] is None)):
                     thisisit = False
