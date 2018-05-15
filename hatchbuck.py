@@ -95,8 +95,10 @@ class Hatchbuck():
         """
         profile['contactId'] = contactId
         log.debug("updating {0}".format(profile))
+        
         if self.noop:
-            return None
+            return profile
+        
         r = requests.put(self.url + 'contact' + '?api_key=' + self.key,
                          json=profile)
         if r.status_code == requests.codes.ok:
