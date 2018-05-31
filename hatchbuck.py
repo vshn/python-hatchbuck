@@ -274,7 +274,8 @@ class Hatchbuck():
                                                   attributename, value):
                 if dictname == 'emails' and attributename == 'address':
                     lookup = self.search_email(value)
-                    if lookup is not None and lookup['contactId'] != profile['contactId']:
+                    if lookup is not None \
+                            and lookup['contactId'] != profile['contactId']:
                         # uh-oh there is already another contact
                         #  with this email address, possible duplicate
                         log.warn(
