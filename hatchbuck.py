@@ -235,13 +235,18 @@ class Hatchbuck():
         for element in profile[dictname]:
             if dictname == "phones":
                 # ignore spaces in phone numbers when comparing
-                if element[attributename].lower().replace(' ', '') \
-                        == value.lower().replace(' ', ''):
-                    return True
+                return self.cleanup_phone_number(element[attributename]) \
+                        == self.cleanup_phone_number(value)
             else:
                 if element[attributename].lower() == value.lower():
                     return True
         return False
+
+    def cleanup_phone_number(self, value):
+        for rep in "()-\xa0":
+            # clean up number
+            value = value.replace(rep, '')
+        return value
 
     def profile_add(self, profile, dictname, attributename, valuelist,
                     moreattributes={}):
@@ -292,6 +297,8 @@ class Hatchbuck():
                             " not adding".format(
                                 value, lookup, profile))
                         return profile
+                elif dictname == 'phones' and attributename == 'number':
+                    value = self.cleanup_phone_number(value)
                 for key in moreattributes:
                     updateprofile[dictname][0][key] = moreattributes[key]
                 # pylint: disable=fixme
