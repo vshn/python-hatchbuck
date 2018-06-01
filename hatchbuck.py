@@ -47,6 +47,8 @@ class Hatchbuck():
             # if none of the returned profiles actually contain
             # the email address return None
             return None
+        elif r.status_code == 401:
+            log.error("Hatchbuck API code wrong or expired?")
         else:
             log.debug("not found")
             return None
@@ -66,6 +68,8 @@ class Hatchbuck():
             value = r.json()
             log.debug("found: {0}".format(value[0]))
             return value[0]
+        elif r.status_code == 401:
+            log.error("Hatchbuck API code wrong or expired?")
         else:
             log.debug("not found")
             return None
@@ -106,6 +110,8 @@ class Hatchbuck():
             value = r.json()
             log.debug("success: {0}".format(value))
             return value
+        elif r.status_code == 401:
+            log.error("Hatchbuck API code wrong or expired?")
         else:
             # this happens e.g. when trying to add an email address
             # that already belongs to another contact
@@ -129,6 +135,8 @@ class Hatchbuck():
             value = r.json()
             log.debug("success: {0}".format(value))
             return value
+        elif r.status_code == 401:
+            log.error("Hatchbuck API code wrong or expired?")
         else:
             log.debug("fail: {0}".format(r.text))
             return None
@@ -317,6 +325,8 @@ class Hatchbuck():
             json=profile)
         if r.status_code == 201:
             log.debug("success: {0}".format(r.text))
+        elif r.status_code == 401:
+            log.error("Hatchbuck API code wrong or expired?")
         else:
             log.debug("fail: {0}".format(r.text))
 
