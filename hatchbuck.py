@@ -97,6 +97,7 @@ class Hatchbuck():
         log.debug("updating {0}".format(profile))
 
         if self.noop:
+            log.debug("skipping update")
             return profile
 
         r = requests.put(self.url + 'contact' + '?api_key=' + self.key,
@@ -273,7 +274,8 @@ class Hatchbuck():
                                                   attributename, value):
                 if dictname == 'emails' and attributename == 'address':
                     lookup = self.search_email(value)
-                    if lookup is not None:
+                    if lookup is not None \
+                            and lookup['contactId'] != profile['contactId']:
                         # uh-oh there is already another contact
                         #  with this email address, possible duplicate
                         log.warn(
