@@ -30,7 +30,8 @@ class Hatchbuck():
             self.hatchbuck_countries = {}
             table = json.load(open('hatchbuck_countries.json'))
             for c in table['ApiIdentifierMaster']['IdentifierList']:
-                self.hatchbuck_countries[c['IdentifierKey']] = c['IdentifierName']
+                self.hatchbuck_countries[c['IdentifierKey']] =\
+                    c['IdentifierName']
         return self.hatchbuck_countries.get(countryId, None)
 
     def _add_country_to_address(self, address):
