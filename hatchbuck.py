@@ -14,7 +14,7 @@ class Hatchbuck():
     url = "https://api.hatchbuck.com/api/v1/"
     key = None
     noop = False
-    countries = None
+    hatchbuck_countries = None
 
     def __init__(self, key, noop=False):
         """
@@ -26,12 +26,12 @@ class Hatchbuck():
         self.noop = noop
 
     def country_lookup(self, countryId):
-        if self.countries is None:
-            self.countries = {}
+        if self.hatchbuck_countries is None:
+            self.hatchbuck_countries = {}
             table = json.load(open('hatchbuck_countries.json'))
             for c in table['ApiIdentifierMaster']['IdentifierList']:
-                self.countries[c['IdentifierKey']] = c['IdentifierName']
-        return self.countries.get(countryId, None)
+                self.hatchbuck_countries[c['IdentifierKey']] = c['IdentifierName']
+        return self.hatchbuck_countries.get(countryId, None)
 
     def _add_country_to_address(self, address):
         address['country'] = self.country_lookup(address['countryId'])
