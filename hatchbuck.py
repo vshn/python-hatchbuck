@@ -391,4 +391,3 @@ class Hatchbuck():
             'value',
             '%s/%s/%s' % (date['month'], date['day'], date['year']),
             {'name': 'Birthday'})
-
