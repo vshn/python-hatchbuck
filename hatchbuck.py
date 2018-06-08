@@ -2,6 +2,7 @@ from pycountry import countries
 import datetime
 import logging
 import requests
+import json
 
 log = logging.getLogger(__name__)
 
@@ -13,6 +14,7 @@ class Hatchbuck():
     url = "https://api.hatchbuck.com/api/v1/"
     key = None
     noop = False
+    countries = None
 
     def __init__(self, key, noop=False):
         """
@@ -22,6 +24,26 @@ class Hatchbuck():
         """
         self.key = key
         self.noop = noop
+
+    def country_lookup(self, countryId):
+        if self.countries is None:
+            self.countries = {}
+            table = json.load(open('hatchbuck_countries.json'))
+            for c in table['ApiIdentifierMaster']['IdentifierList']:
+                self.countries[c['IdentifierKey']] = c['IdentifierName']
+        return self.countries.get(countryId, None)
+
+    def _add_country_to_address(self, address):
+        address['country'] = self.country_lookup(address['countryId'])
+        return address
+
+    def add_countries(self, profile):
+        profile['addresses'] = [
+                self._add_country_to_address(addr)
+                for addr
+                in profile['addresses']
+        ]
+        return profile
 
     def search_email(self, email):
         """
@@ -38,7 +60,7 @@ class Hatchbuck():
             for profile in result:
                 if self.profile_contains(profile, 'emails', 'address', email):
                     log.debug("found: {0}".format(profile))
-                    return profile
+                    return self.add_countries(profile)
                 else:
                     log.debug(
                         "found profile without matching address: {0}".format(
@@ -67,7 +89,7 @@ class Hatchbuck():
         if r.status_code == 200:
             value = r.json()
             log.debug("found: {0}".format(value[0]))
-            return value[0]
+            return self.add_countries(value[0])
         elif r.status_code == 401:
             log.error("Hatchbuck API code wrong or expired?")
         else:
@@ -109,7 +131,7 @@ class Hatchbuck():
         if r.status_code == requests.codes.ok:
             value = r.json()
             log.debug("success: {0}".format(value))
-            return value
+            return self.add_countries(value)
         elif r.status_code == 401:
             log.error("Hatchbuck API code wrong or expired?")
         else:
@@ -134,7 +156,7 @@ class Hatchbuck():
         if r.status_code == 200:
             value = r.json()
             log.debug("success: {0}".format(value))
-            return value
+            return self.add_countries(value)
         elif r.status_code == 401:
             log.error("Hatchbuck API code wrong or expired?")
         else:
@@ -369,3 +391,4 @@ class Hatchbuck():
             'value',
             '%s/%s/%s' % (date['month'], date['day'], date['year']),
             {'name': 'Birthday'})
+
