@@ -631,3 +631,9 @@ Output
                    'value': ''},
                  {'name': 'company size', 'type': 'Text', 'value': ''},
                  {'name': 'Birthday', 'type': 'Date', 'value': '1/1/1984'}],
+
+Countries lookup
+----------------
+
+Hatchbuck uses a not very intuitive countryId in postal addresses, the lookup table is at https://app.hatchbuck.com/Account/APICountryKey_Json and saved in hatchbuck_countries.json in this repo
+
