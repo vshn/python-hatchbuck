@@ -1,7 +1,7 @@
 from os.path import abspath, dirname, join
 from setuptools import setup
 
-__version__ = '1.0.10'
+__version__ = '1.0.11'
 
 
 def read_file(filename):
@@ -15,6 +15,7 @@ setup(name='hatchbuck',
       version=__version__,
       description='Hatchbuck.com CRM API bindings for Python',
       long_description=read_file('README.rst'),
+      include_package_data=True,
       keywords=['hatchbuck', 'CRM', 'API'],
       classifiers=[
           'Intended Audience :: Developers',

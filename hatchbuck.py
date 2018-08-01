@@ -1,3 +1,4 @@
+import os
 from pycountry import countries
 import datetime
 import logging
@@ -28,14 +29,14 @@ class Hatchbuck():
     def country_lookup(self, countryId):
         if self.hatchbuck_countries is None:
             self.hatchbuck_countries = {}
-            table = json.load(open('hatchbuck_countries.json'))
+            table = json.load(open(os.path.dirname(__file__) + '/hatchbuck_countries.json'))
             for c in table['ApiIdentifierMaster']['IdentifierList']:
                 self.hatchbuck_countries[c['IdentifierKey']] =\
                     c['IdentifierName']
         return self.hatchbuck_countries.get(countryId, None)
 
     def _add_country_to_address(self, address):
-        address['country'] = self.country_lookup(address['countryId'])
+        address['country'] = self.country_lookup(address.get('countryId', None))
         return address
 
     def add_countries(self, profile):
