@@ -1,3 +1,3 @@
-from . hatchbuck import Hatchbuck
+from hatchbuck.hatchbuck import Hatchbuck
 
 __all__ = ['Hatchbuck']
