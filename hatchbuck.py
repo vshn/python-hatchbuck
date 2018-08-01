@@ -1,9 +1,9 @@
-import os
 from pycountry import countries
 import datetime
 import logging
 import requests
 import json
+import pkg_resources
 
 log = logging.getLogger(__name__)
 
@@ -29,8 +29,11 @@ class Hatchbuck():
     def country_lookup(self, countryId):
         if self.hatchbuck_countries is None:
             self.hatchbuck_countries = {}
-            table = json.load(
-                open(os.path.dirname(__file__) + '/hatchbuck_countries.json')
+            table = json.loads(
+                pkg_resources.resource_stream(
+                    __name__,
+                    'hatchbuck_countries.json'
+                ).read().decode()
             )
             for c in table['ApiIdentifierMaster']['IdentifierList']:
                 self.hatchbuck_countries[c['IdentifierKey']] =\

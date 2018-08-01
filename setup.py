@@ -1,7 +1,7 @@
 from os.path import abspath, dirname, join
 from setuptools import setup
 
-__version__ = '1.0.11'
+__version__ = '1.0.12'
 
 
 def read_file(filename):
@@ -15,6 +15,9 @@ setup(name='hatchbuck',
       version=__version__,
       description='Hatchbuck.com CRM API bindings for Python',
       long_description=read_file('README.rst'),
+      packages=['hatchbuck'],
+      package_dir={'hatchbuck': '.'},
+      package_data={'hatchbuck': ['hatchbuck_countries.json']},
       include_package_data=True,
       keywords=['hatchbuck', 'CRM', 'API'],
       classifiers=[
@@ -27,7 +30,6 @@ setup(name='hatchbuck',
       author='VSHN AG, Bashar Said',
       author_email='bashar.said@vshn.ch',
       license='BSD',
-      py_modules=['hatchbuck'],
       install_requires=[
           'requests>=2',
           'pycountry>=1',
