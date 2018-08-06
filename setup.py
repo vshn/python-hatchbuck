@@ -1,7 +1,7 @@
 from os.path import abspath, dirname, join
 from setuptools import setup
 
-__version__ = '1.0.14'
+__version__ = '1.0.15'
 
 
 def read_file(filename):
