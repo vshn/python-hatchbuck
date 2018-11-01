@@ -8,10 +8,11 @@ import pkg_resources
 log = logging.getLogger(__name__)
 
 
-class Hatchbuck():
+class Hatchbuck:
     """
     Class to interact with the Hatchbuck.com API
     """
+
     url = "https://api.hatchbuck.com/api/v1/"
     key = None
     noop = False
@@ -31,26 +32,26 @@ class Hatchbuck():
             self.hatchbuck_countries = {}
             table = json.loads(
                 pkg_resources.resource_stream(
-                    __name__,
-                    'hatchbuck_countries.json'
-                ).read().decode()
+                    __name__, "hatchbuck_countries.json"
+                )
+                .read()
+                .decode()
             )
-            for c in table['ApiIdentifierMaster']['IdentifierList']:
-                self.hatchbuck_countries[c['IdentifierKey']] =\
-                    c['IdentifierName']
+            for c in table["ApiIdentifierMaster"]["IdentifierList"]:
+                self.hatchbuck_countries[c["IdentifierKey"]] = c[
+                    "IdentifierName"
+                ]
         return self.hatchbuck_countries.get(countryId, None)
 
     def _add_country_to_address(self, address):
-        address['country'] = self.country_lookup(
-            address.get('countryId', None)
+        address["country"] = self.country_lookup(
+            address.get("countryId", None)
         )
         return address
 
     def add_countries(self, profile):
-        profile['addresses'] = [
-                self._add_country_to_address(addr)
-                for addr
-                in profile['addresses']
+        profile["addresses"] = [
+            self._add_country_to_address(addr) for addr in profile["addresses"]
         ]
         return profile
 
@@ -60,20 +61,23 @@ class Hatchbuck():
         :param email:The email address we're looking for
         :return:Return profile if it contains the email address or return None
         """
-        query = {'emails': [{'address': email}]}
+        query = {"emails": [{"address": email}]}
         log.debug("searching for {0}".format(query))
-        r = requests.post(self.url + 'contact/search' + '?api_key=' + self.key,
-                          json=query)
+        r = requests.post(
+            self.url + "contact/search" + "?api_key=" + self.key, json=query
+        )
         if r.status_code == 200:
             result = r.json()
             for profile in result:
-                if self.profile_contains(profile, 'emails', 'address', email):
+                if self.profile_contains(profile, "emails", "address", email):
                     log.debug("found: {0}".format(profile))
                     return self.add_countries(profile)
                 else:
                     log.debug(
                         "found profile without matching address: {0}".format(
-                            profile))
+                            profile
+                        )
+                    )
                     continue
             # if none of the returned profiles actually contain
             # the email address return None
@@ -91,10 +95,11 @@ class Hatchbuck():
         :param last:The last name we're looking for
         :return:Return profile or return None
         """
-        query = {'firstName': first, 'lastName': last}
+        query = {"firstName": first, "lastName": last}
         log.debug("searching for {0}".format(query))
-        r = requests.post(self.url + 'contact/search' + '?api_key=' + self.key,
-                          json=query)
+        r = requests.post(
+            self.url + "contact/search" + "?api_key=" + self.key, json=query
+        )
         if r.status_code == 200:
             value = r.json()
             log.debug("found: {0}".format(value[0]))
@@ -128,15 +133,16 @@ class Hatchbuck():
         :param profile:The profile information we want the contactID to have
         :return:Return profile with updates if successful or None if fail
         """
-        profile['contactId'] = contactId
+        profile["contactId"] = contactId
         log.debug("updating {0}".format(profile))
 
         if self.noop:
             log.debug("skipping update")
             return profile
 
-        r = requests.put(self.url + 'contact' + '?api_key=' + self.key,
-                         json=profile)
+        r = requests.put(
+            self.url + "contact" + "?api_key=" + self.key, json=profile
+        )
         if r.status_code == requests.codes.ok:
             value = r.json()
             log.debug("success: {0}".format(value))
@@ -158,10 +164,11 @@ class Hatchbuck():
         """
         log.debug("creating {0}".format(profile))
         if self.noop:
-            profile['contactId'] = None
+            profile["contactId"] = None
             return profile
-        r = requests.post(self.url + 'contact' + '?api_key=' + self.key,
-                          json=profile)
+        r = requests.post(
+            self.url + "contact" + "?api_key=" + self.key, json=profile
+        )
         if r.status_code == 200:
             value = r.json()
             log.debug("success: {0}".format(value))
@@ -182,33 +189,34 @@ class Hatchbuck():
         """
         # try to convert the country name from a two-letter abbreviation
         try:
-            country = countries.get(alpha2=address['country']).name
+            country = countries.get(alpha2=address["country"]).name
         except KeyError:
-            country = address['country']
+            country = address["country"]
 
         # convert the dict field names to hatchbuck names
         update = {
-            'street': address['street'],
-            'zip': address['zip_code'],
-            'city': address['city'],
-            'country': country,
-            'type': addresstype,
+            "street": address["street"],
+            "zip": address["zip_code"],
+            "city": address["city"],
+            "country": country,
+            "type": addresstype,
         }
 
         # check that there is at least one field that is not empty
         notempty = False
-        for key in ['street', 'zip', 'city', 'country']:
+        for key in ["street", "zip", "city", "country"]:
             if update[key] is not None and update[key] != "":
                 notempty = True
         if not notempty:
             return profile
 
-        if 'addresses' not in profile:
-            profile['addresses'] = []
+        if "addresses" not in profile:
+            profile["addresses"] = []
 
         if not self.address_exists(profile, update):
-            updated = self.update(profile['contactId'],
-                                  {'addresses': [update]})
+            updated = self.update(
+                profile["contactId"], {"addresses": [update]}
+            )
             if updated is None:
                 # update failed or noope'd
                 return profile
@@ -218,16 +226,18 @@ class Hatchbuck():
         return profile
 
     def address_exists(self, profile, address):
-        for item in profile['addresses']:
+        for item in profile["addresses"]:
             thisisit = True
             for key in address:
-                if key == "country" and not item.get('country', False):
+                if key == "country" and not item.get("country", False):
                     # handle hatchbuck API not returning 'country'
                     # but 'countryid' by ignoring country if it does
                     # not exist in the profile
                     continue
-                if not (item[key] == address[key] or (
-                        item[key] == "" and address[key] is None)):
+                if not (
+                    item[key] == address[key]
+                    or (item[key] == "" and address[key] is None)
+                ):
                     thisisit = False
             if thisisit:
                 # all fields matched
@@ -266,8 +276,9 @@ class Hatchbuck():
         for element in profile[dictname]:
             if dictname == "phones":
                 # ignore spaces in phone numbers when comparing
-                return self.cleanup_phone_number(element[attributename]) \
-                        == self.cleanup_phone_number(value)
+                return self.cleanup_phone_number(
+                    element[attributename]
+                ) == self.cleanup_phone_number(value)
             else:
                 if element[attributename].lower() == value.lower():
                     return True
@@ -276,11 +287,12 @@ class Hatchbuck():
     def cleanup_phone_number(self, value):
         for rep in "()-\xa0":
             # clean up number
-            value = value.replace(rep, '')
+            value = value.replace(rep, "")
         return value
 
-    def profile_add(self, profile, dictname, attributename, valuelist,
-                    moreattributes={}):
+    def profile_add(
+        self, profile, dictname, attributename, valuelist, moreattributes={}
+    ):
         """
         Add a new fields to the profile if it does not exist,
         or update the field if it exists
@@ -313,29 +325,35 @@ class Hatchbuck():
                 updateprofile = {dictname: value}
             else:
                 updateprofile = {dictname: [{attributename: value}]}
-            if value is not None and value is not '' \
-                    and not self.profile_contains(profile, dictname,
-                                                  attributename, value):
-                if dictname == 'emails' and attributename == 'address':
+            if (
+                value is not None
+                and value is not ""
+                and not self.profile_contains(
+                    profile, dictname, attributename, value
+                )
+            ):
+                if dictname == "emails" and attributename == "address":
                     lookup = self.search_email(value)
-                    if lookup is not None \
-                            and lookup['contactId'] != profile['contactId']:
+                    if (
+                        lookup is not None
+                        and lookup["contactId"] != profile["contactId"]
+                    ):
                         # uh-oh there is already another contact
                         #  with this email address, possible duplicate
                         log.warn(
                             "uh-oh trying to add email address {0} to {2}"
                             " already belonging to another contact {1},"
-                            " not adding".format(
-                                value, lookup, profile))
+                            " not adding".format(value, lookup, profile)
+                        )
                         return profile
-                elif dictname == 'phones' and attributename == 'number':
+                elif dictname == "phones" and attributename == "number":
                     value = self.cleanup_phone_number(value)
                 for key in moreattributes:
                     updateprofile[dictname][0][key] = moreattributes[key]
                 # pylint: disable=fixme
                 # TODO updating the profile through the API right now instead
                 # TODO  of batching them, can be optimized later if necessary
-                updated = self.update(profile['contactId'], updateprofile)
+                updated = self.update(profile["contactId"], updateprofile)
                 if updated is not None:
                     # update not failed or noop'ed
                     profile = updated
@@ -344,7 +362,8 @@ class Hatchbuck():
             else:
                 log.debug(
                     "skipping update because value empty "
-                    "or there already: {0}".format(updateprofile))
+                    "or there already: {0}".format(updateprofile)
+                )
         return profile
 
     def add_tag(self, contactId, tagname):
@@ -354,12 +373,13 @@ class Hatchbuck():
         :param tagname: Tag that we want to add to contactId
         """
         log.debug("adding tag {0} to contact {1}".format(tagname, contactId))
-        profile = [{'name': tagname}]
+        profile = [{"name": tagname}]
         if self.noop:
             return None
         r = requests.post(
-            self.url + 'contact/' + contactId + '/Tags?api_key=' + self.key,
-            json=profile)
+            self.url + "contact/" + contactId + "/Tags?api_key=" + self.key,
+            json=profile,
+        )
         if r.status_code == 201:
             log.debug("success: {0}".format(r.text))
         elif r.status_code == 401:
@@ -373,14 +393,16 @@ class Hatchbuck():
         :param contactId: A contact ID from which the tag should be removed
         :param tagname: Tag that we want to remove from the contact
         """
-        log.debug("removing tag {0} from contact {1}".format(tagname,
-                                                             contactId))
-        profile = [{'name': tagname}]
+        log.debug(
+            "removing tag {0} from contact {1}".format(tagname, contactId)
+        )
+        profile = [{"name": tagname}]
         if self.noop:
             return None
         r = requests.delete(
-            self.url + 'contact/' + contactId + '/Tags?api_key=' + self.key,
-            json=profile)
+            self.url + "contact/" + contactId + "/Tags?api_key=" + self.key,
+            json=profile,
+        )
         if r.status_code == 201:
             log.debug("success: {0}".format(r.text))
         elif r.status_code == 401:
@@ -395,28 +417,30 @@ class Hatchbuck():
         :param date: The birthday should be added to the file
         :return:Return profile after adding the birthday
         """
-        if not date.get('day', 0) or not date.get('month', 0):
+        if not date.get("day", 0) or not date.get("month", 0):
             log.debug("no day/month in birthday {0}, skipping".format(date))
             return profile
-        if not date.get('year', 0):
+        if not date.get("year", 0):
             # set year 1000 for unknown year, year 0 is not
             # supported by python datetime.date
-            date['year'] = 1000
-        oldbirthday = ''
-        for field in profile.get('customFields', []):
-            if field['name'] == 'Birthday':
-                oldbirthday = field['value']
+            date["year"] = 1000
+        oldbirthday = ""
+        for field in profile.get("customFields", []):
+            if field["name"] == "Birthday":
+                oldbirthday = field["value"]
                 break
         if oldbirthday:
-            oldbirthday = datetime.datetime.strptime(oldbirthday,
-                                                     '%m/%d/%Y').date()
+            oldbirthday = datetime.datetime.strptime(
+                oldbirthday, "%m/%d/%Y"
+            ).date()
             log.debug("found old birthday: {0}".format(oldbirthday))
-            if oldbirthday.year != 1000 and date['year'] == 1000:
+            if oldbirthday.year != 1000 and date["year"] == 1000:
                 # if there is a proper year already lets not overwrite that
-                date['year'] = oldbirthday.year
+                date["year"] = oldbirthday.year
         return self.profile_add(
             profile,
-            'customFields',
-            'value',
-            '%s/%s/%s' % (date['month'], date['day'], date['year']),
-            {'name': 'Birthday'})
+            "customFields",
+            "value",
+            "%s/%s/%s" % (date["month"], date["day"], date["year"]),
+            {"name": "Birthday"},
+        )
