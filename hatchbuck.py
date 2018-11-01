@@ -349,16 +349,36 @@ class Hatchbuck():
 
     def add_tag(self, contactId, tagname):
         """
-        Add tags by contact id
+        Add tag to contact
         :param contactId: A contact ID to which the tag should be added
         :param tagname: Tag that we want to add to contactId
-        :return: Return Add the tag if success or the Tag does not add if fail
         """
         log.debug("adding tag {0} to contact {1}".format(tagname, contactId))
         profile = [{'name': tagname}]
         if self.noop:
             return None
         r = requests.post(
+            self.url + 'contact/' + contactId + '/Tags?api_key=' + self.key,
+            json=profile)
+        if r.status_code == 201:
+            log.debug("success: {0}".format(r.text))
+        elif r.status_code == 401:
+            log.error("Hatchbuck API code wrong or expired?")
+        else:
+            log.debug("fail: {0}".format(r.text))
+
+    def remove_tag(self, contactId, tagname):
+        """
+        Remove tag from contact
+        :param contactId: A contact ID from which the tag should be removed
+        :param tagname: Tag that we want to remove from the contact
+        """
+        log.debug("removing tag {0} from contact {1}".format(tagname,
+                                                             contactId))
+        profile = [{'name': tagname}]
+        if self.noop:
+            return None
+        r = requests.delete(
             self.url + 'contact/' + contactId + '/Tags?api_key=' + self.key,
             json=profile)
         if r.status_code == 201:
