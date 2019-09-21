@@ -327,7 +327,7 @@ class Hatchbuck:
                 updateprofile = {dictname: [{attributename: value}]}
             if (
                 value is not None
-                and value is not ""
+                and value != ""
                 and not self.profile_contains(
                     profile, dictname, attributename, value
                 )
