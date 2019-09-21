@@ -1,7 +1,7 @@
 from os.path import abspath, dirname, join
 from setuptools import setup
 
-__version__ = '1.0.18'
+__version__ = '1.0.19'
 
 
 def read_file(filename):
@@ -30,6 +30,10 @@ setup(name='hatchbuck',
       author='VSHN AG, Bashar Said',
       author_email='bashar.said@vshn.ch',
       license='BSD',
+      python_requires='>=3.6',
+      extras_require={
+          'dev': ['tox'],
+      },
       install_requires=[
           'requests>=2',
           'pycountry>=1',
