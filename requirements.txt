@@ -2,7 +2,7 @@ bleach==3.0.2
 certifi==2018.10.15
 chardet==3.0.4
 DateTime==4.3
-docutils==0.14
+docutils==0.15.2
 filelock==3.0.10
 hatchbuck==1.0.16
 idna==2.7
