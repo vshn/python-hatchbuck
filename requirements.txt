@@ -3,7 +3,7 @@ certifi==2018.10.15
 chardet==3.0.4
 DateTime==4.3
 docutils==0.14
-filelock==3.0.10
+filelock==3.0.12
 hatchbuck==1.0.16
 idna==2.7
 multidict==4.4.2
