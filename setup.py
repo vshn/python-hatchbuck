@@ -31,7 +31,7 @@ setup(
     author="VSHN AG, Bashar Said",
     author_email="bashar.said@vshn.ch",
     license="BSD",
-    python_requires=">=3.6",
+    python_requires=">=3.5",
     extras_require={"dev": ["tox"]},
     install_requires=["requests>=2", "pycountry>=1"],
 )
