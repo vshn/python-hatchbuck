@@ -12,8 +12,7 @@ class TestHatchbuck(unittest.TestCase):
                 "countryId": "QmJzeldzQ25rbXluZG"
                 "c4RzlDYmFmYlZOY2xTemMwX2"
                 "ZoMll5UTJPenhsNDE1",
-                "id": "Q0NjajF2U1lTWnBHM1hjRFlnQzhzMH"
-                "Z2UUxLY2d6a1JaU3Nicm5hRTN6azE1",
+                "id": "Q0NjajF2U1lTWnBHM1hjRFlnQzhzMH" "Z2UUxLY2d6a1JaU3Nicm5hRTN6azE1",
                 "state": "ZH",
                 "street": "Neugasse 10",
                 "type": "Work",
@@ -25,25 +24,19 @@ class TestHatchbuck(unittest.TestCase):
         ],
         "campaigns": [],
         "company": "VSHN AG",
-        "contactId": "SUFYbGdOaEQ0cWR2N1JfV183UFNBS"
-        "DllTktCc3E3OWRsN09qaW4tU3JqbzE1",
+        "contactId": "SUFYbGdOaEQ0cWR2N1JfV183UFNBS" "DllTktCc3E3OWRsN09qaW4tU3JqbzE1",
         "customFields": [
             {"name": "Comments", "type": "MText", "value": ""},
             {"name": "Invoiced", "type": "Number", "value": ""},
             {"name": "Language", "type": "Text", "value": ""},
-            {
-                "name": "working at company since",
-                "type": "Text",
-                "value": "1.1.2018",
-            },
+            {"name": "working at company since", "type": "Text", "value": "1.1.2018"},
             {"name": "company size", "type": "Text", "value": "25"},
             {"name": "Birthday", "type": "Date", "value": ""},
         ],
         "emails": [
             {
                 "address": "bashar.said@vshn.ch",
-                "id": "S2lIY2NOS2dBRnRCamEyQU"
-                "ZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1",
+                "id": "S2lIY2NOS2dBRnRCamEyQU" "ZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1",
                 "type": "Work",
                 "typeId": "VmhlQU1pZVJSUFFJSjZfM"
                 "HRmT1laUmwtT0FMNW9hbnBuZHd"
@@ -55,8 +48,7 @@ class TestHatchbuck(unittest.TestCase):
         "lastName": "Said",
         "phones": [
             {
-                "id": "OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4T"
-                "VppZlF4NklrNmZfSnBhaDZwQTE1",
+                "id": "OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4T" "VppZlF4NklrNmZfSnBhaDZwQTE1",
                 "number": "+(414) 454-5 53 00",
                 "type": "Work",
                 "typeId": "QTBncHV0dndnaGNnRVMzLTR0SGtF"
@@ -66,15 +58,13 @@ class TestHatchbuck(unittest.TestCase):
         ],
         "referredBy": "",
         "salesRep": {
-            "id": "VGpwQTRGTmw4MExVODl1b1BmXzBodTBwWnZXS2dUZ"
-            "zVvSkJKZUx4UlFpdzE1",
+            "id": "VGpwQTRGTmw4MExVODl1b1BmXzBodTBwWnZXS2dUZ" "zVvSkJKZUx4UlFpdzE1",
             "username": "aarno.aukia",
         },
         "socialNetworks": [
             {
                 "address": "https://twitter.com/bashar_2018",
-                "id": "S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg"
-                "5Z3piMERVbEFsam42azE1",
+                "id": "S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg" "5Z3piMERVbEFsam42azE1",
                 "typeId": "ZGRlMHpBaXY3M05YUGc4a0pIY3lRdUFKN1JYa"
                 "Dd2VEphbzhSRkdzM2x4bzE1",
             }
@@ -108,9 +98,7 @@ class TestHatchbuck(unittest.TestCase):
         )
 
         # try to add the address again
-        profile = hatchbuck.profile_add_address(
-            testProfile, existingaddress, "Work"
-        )
+        profile = hatchbuck.profile_add_address(testProfile, existingaddress, "Work")
 
         # Check that the address is still there
         self.assertTrue(
