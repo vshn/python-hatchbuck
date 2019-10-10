@@ -6,9 +6,9 @@ import datetime
 import json
 import logging
 
+import phonenumbers
 import pkg_resources
 import requests
-
 from pycountry import countries
 
 LOG = logging.getLogger(__name__)
@@ -308,10 +308,147 @@ class Hatchbuck:
         :param value: phone number
         :return: clean phone number
         """
-        for rep in "()-\xa0":
+        for rep in "()-\xa0 ":
             # clean up number
             value = value.replace(rep, "")
         return value
+
+    def format_phone_number(self, number, country=None):
+        """
+        format phone number in international format
+        :param number: phone number
+        :param country: two digit country code if number is in local format
+        :return: clean phone number
+        """
+        try:
+            phonenumber = phonenumbers.parse(self.cleanup_phone_number(number), country)
+            return phonenumbers.format_number(
+                phonenumber, phonenumbers.PhoneNumberFormat.INTERNATIONAL
+            )
+        except phonenumbers.phonenumberutil.NumberParseException:
+            # the number could not be formatted, e.g. because of missing country
+            return None
+
+    def clean_all_phone_numbers(self, profile):
+        """
+        Format all existing phone numbers in profile
+        :param profile: hatchbuck contact profile
+        :return: modified profile with formatted phone numbers
+        """
+        # check if there is consensus about the contacts country
+        countrycode = self.get_countrycode(profile)
+
+        for num in list(profile.get("phones", [])):
+            # iterate through a copy of the list to be able to delete elements
+            # when self.noop is True
+            formatted = self.format_phone_number(num["number"])
+            if formatted is None and countrycode is not None:
+                formatted = self.format_phone_number(num["number"], countrycode)
+            if formatted is None:
+                # local number and unknown country? ignore and continue
+                formatted = self.cleanup_phone_number(num["number"])
+            # check if this number is a duplicate
+            if any(
+                [
+                    other["id"] != num["id"]
+                    and (
+                        other["number"] == formatted  # same number
+                        or (
+                            formatted.startswith("0")  # local number
+                            and self.cleanup_phone_number(other["number"]).endswith(
+                                formatted[1:]
+                            )
+                        )
+                    )
+                    for other in profile["phones"]
+                ]
+            ):
+                # this formatted is a duplicate or substring
+                # (local version of an existing international version of the same number)
+                # remove this duplicate
+                logging.debug(
+                    "%s: phone number %s is a duplicate, removing",
+                    self.short_contact(profile),
+                    num["number"],
+                )
+                if self.noop:
+                    profile["phones"].remove(num)
+                else:
+                    newprofile = self.update(
+                        profile["contactId"],
+                        {
+                            "phones": [
+                                {"number": "", "id": num["id"], "type": num["type"]}
+                            ]
+                        },
+                    )
+                    if newprofile is not None:
+                        # if the update was successful continue working
+                        # with the new profile
+                        profile = newprofile
+
+            elif formatted != num["number"]:
+                # the number was updated
+                logging.debug(
+                    "%s: phone number %s formatted, updating",
+                    self.short_contact(profile),
+                    formatted,
+                )
+                if self.noop:
+                    num["number"] = formatted
+                else:
+                    newprofile = self.update(
+                        profile["contactId"],
+                        {
+                            "phones": [
+                                {
+                                    "number": formatted,
+                                    "id": num["id"],
+                                    "type": num["type"],
+                                }
+                            ]
+                        },
+                    )
+                    if newprofile is not None:
+                        # if the update was successful continue working
+                        # with the new profile
+                        profile = newprofile
+            else:
+                # number was not changed
+                pass
+        return profile
+
+    @staticmethod
+    def get_countrycode(profile):
+        """
+        Extract country code from addresses
+        :param profile: contact profile
+        :return: two-letter country code or None if not unambiguous
+        """
+        countries_found = []
+        for addr in profile.get("addresses", []):
+            if (
+                addr.get("country", False)
+                and addr["country"].lower() not in countries_found
+            ):
+                countries_found.append(addr["country"].lower())
+        logging.debug("countries found %s", countries_found)
+        if len(countries_found) == 1:
+            # look up the country code
+            return countries.lookup(countries_found[0]).alpha_2
+        return None
+
+    @staticmethod
+    def short_contact(profile):
+        """
+        Return a short version of an contact
+        """
+        text = ""
+        if profile.get("firstName", False) and profile.get("lastName", False):
+            text += "%s %s, " % (profile["firstName"], profile["lastName"])
+        for email in profile.get("emails", []):
+            text += "%s, " % email["address"]
+        return "Contact(%s)" % text[:-2]
 
     def profile_add(
         self, profile, dictname, attributename, valuelist, moreattributes=None
