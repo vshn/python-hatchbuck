@@ -331,9 +331,9 @@ class Hatchbuck:
 
     def clean_all_phone_numbers(self, profile):
         """
-        Format all existing phone numbers in profile
+        Format and deduplicate all phone numbers in profile
         :param profile: hatchbuck contact profile
-        :return: modified profile with formatted phone numbers
+        :return: modified profile
         """
         # check if there is consensus about the contacts country
         countrycode = self.get_countrycode(profile)
