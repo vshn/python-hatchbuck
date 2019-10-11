@@ -181,6 +181,129 @@ class TestHatchbuck(unittest.TestCase):
         )
         self.assertTrue(profile, testProfile)
 
+    def test_cleanup_phone_number(self):
+        hatchbuck = Hatchbuck("")
+        self.assertEqual(
+            hatchbuck.cleanup_phone_number("+41 (44) 545-53-00"), "+41445455300"
+        )
+        self.assertEqual(hatchbuck.cleanup_phone_number("+41445455300"), "+41445455300")
+        self.assertEqual(
+            hatchbuck.cleanup_phone_number("+41 44 545 53 00"), "+41445455300"
+        )
+        self.assertEqual(
+            hatchbuck.cleanup_phone_number("\xa0+41 44 545 53 00\xa0"), "+41445455300"
+        )
+
+    def test_format_phone_number(self):
+        hatchbuck = Hatchbuck("")
+        self.assertEqual(
+            hatchbuck.format_phone_number("+41445455300"), "+41 44 545 53 00"
+        )
+        self.assertEqual(
+            hatchbuck.format_phone_number("\xa0+41(44)545-53-00\xa0"),
+            "+41 44 545 53 00",
+        )
+        self.assertEqual(
+            hatchbuck.format_phone_number("+41 44 545 53 00"), "+41 44 545 53 00"
+        )
+        self.assertEqual(hatchbuck.format_phone_number("044 545 53 00"), None)
+        self.assertEqual(
+            hatchbuck.format_phone_number("044 545 53 00", "CH"), "+41 44 545 53 00"
+        )
+
+    def test_clean_all_phone_numbers(self):
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
+        profile1 = {
+            "phones": [
+                {
+                    "id": "1",
+                    "number": "+(414) 454-5 53 00",
+                    "type": "Work",
+                    "typeId": "asdf",
+                },
+                {
+                    "id": "2",
+                    "number": "+(414) 454-5 53 00",
+                    "type": "Home",
+                    "typeId": "qwer",
+                },
+                {
+                    "id": "3",
+                    "number": "(044) 545-53-00",
+                    "type": "Work",
+                    "typeId": "asdf",
+                },
+            ]
+        }
+        self.assertEqual(
+            hatchbuck.clean_all_phone_numbers(profile1),
+            {
+                "phones": [
+                    {
+                        "id": "1",
+                        "number": "+41 44 545 53 00",
+                        "type": "Work",
+                        "typeId": "asdf",
+                    }
+                ]
+            },
+        )
+        profile2 = {
+            "phones": [
+                {
+                    "id": "1",
+                    "number": "(044) 545-53-00",
+                    "type": "Work",
+                    "typeId": "asdf",
+                }
+            ],
+            "addresses": [{"country": "Switzerland"}],
+        }
+        self.assertEqual(
+            hatchbuck.clean_all_phone_numbers(profile2),
+            {
+                "phones": [
+                    {
+                        "id": "1",
+                        "number": "+41 44 545 53 00",
+                        "type": "Work",
+                        "typeId": "asdf",
+                    }
+                ],
+                "addresses": [{"country": "Switzerland"}],
+            },
+        )
+
+    def test_short_contact(self):
+        hatchbuck = Hatchbuck("")
+        self.assertEqual(
+            hatchbuck.short_contact(testProfile),
+            "Contact(Bashar Said, bashar.said@vshn.ch)",
+        )
+        self.assertEqual(hatchbuck.short_contact({}), "Contact()")
+        self.assertEqual(
+            hatchbuck.short_contact({"firstName": "firstName", "lastName": "lastName"}),
+            "Contact(firstName lastName)",
+        )
+        self.assertEqual(
+            hatchbuck.short_contact(
+                {"emails": [{"address": "emailaddress@example.com"}]}
+            ),
+            "Contact(emailaddress@example.com)",
+        )
+
+    def test_get_countrycode(self):
+        hatchbuck = Hatchbuck("")
+        self.assertEqual(hatchbuck.get_countrycode(testProfile), "CH")  # unique country
+        self.assertEqual(hatchbuck.get_countrycode({}), None)  # no country
+        self.assertEqual(
+            hatchbuck.get_countrycode(
+                {"addresses": [{"country": "Switzerland"}, {"country": "Germany"}]}
+            ),
+            None,
+        )  # ambiguous country
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,7 @@
 from os.path import abspath, dirname, join
 from setuptools import setup
 
-__version__ = "1.0.20"
+__version__ = "1.0.21"
 
 
 def read_file(filename):
@@ -33,5 +33,5 @@ setup(
     license="BSD",
     python_requires=">=3.5",
     extras_require={"dev": ["tox"]},
-    install_requires=["requests>=2", "pycountry>=1"],
+    install_requires=["phonenumbers>=8", "pycountry>=1", "requests>=2"],
 )

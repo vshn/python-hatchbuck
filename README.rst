@@ -637,3 +637,19 @@ Countries lookup
 
 Hatchbuck uses a not very intuitive countryId in postal addresses, the lookup table is at https://app.hatchbuck.com/Account/APICountryKey_Json and saved in hatchbuck_countries.json in this repo
 
+Phone number cleanup
+--------------------
+
+When combining data from multiple sources multiple phone numbers pile up in the contact that are actually the same number, just in different formats (national, international) and formatted differently (with spaces, brackets etc, without). The module includes a method to clean and deduplicate all phone numbers
+
+.. code:: python
+
+    from hatchbuck import Hatchbuck
+    pp = pprint.PrettyPrinter()
+    hatchbuck = Hatchbuck('NINIGkhjhg348gssdh2uh2hf6gsjd...')
+    profile = hatchbuck.search_email('bashar.said@vshn.ch')
+    # contains both "+41445455300" and "0445455300" phone numbers,
+    # being the same number in international and national formats
+    profile = hatchbuck.clean_all_phone_numbers(profile)
+    # the redundant local number is removed and the international number is formatted as "+41 44 545 53 00"
+
