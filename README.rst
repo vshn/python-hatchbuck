@@ -652,4 +652,3 @@ When combining data from multiple sources multiple phone numbers pile up in the 
     # being the same number in international and national formats
     profile = hatchbuck.clean_all_phone_numbers(profile)
     # the redundant local number is removed and the international number is formatted as "+41 44 545 53 00"
-
