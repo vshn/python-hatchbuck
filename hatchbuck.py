@@ -5,6 +5,7 @@ Hatchbuck.com CRM API bindings for Python
 import datetime
 import json
 import logging
+import re
 
 import phonenumbers
 import pkg_resources
@@ -33,7 +34,7 @@ class Hatchbuck:
         self.key = key
         self.noop = noop
 
-    def country_lookup(self, country_id):
+    def _country_lookup(self, country_id):
         """
         look up the country name by country ID, parsing and caching the table on first lookup
         :param country_id: the hatchbuck country ID to get the name for
@@ -60,10 +61,10 @@ class Hatchbuck:
         :param address: dict containing 'countryId' key
         :return: the dict with an additional 'country' key
         """
-        address["country"] = self.country_lookup(address.get("countryId", None))
+        address["country"] = self._country_lookup(address.get("countryId", None))
         return address
 
-    def add_countries(self, profile):
+    def _add_countries(self, profile):
         """
         add the country name to all addresses in the profile
         :param profile: hatchbuck profile dict
@@ -90,7 +91,7 @@ class Hatchbuck:
             for profile in req.json():
                 if self.profile_contains(profile, "emails", "address", email):
                     LOG.debug("found: %s", profile)
-                    result = self.add_countries(profile)
+                    result = self._add_countries(profile)
                 else:
                     LOG.debug("found profile without matching address: %s", profile)
                     continue
@@ -118,7 +119,7 @@ class Hatchbuck:
         if req.status_code == 200:
             value = req.json()
             LOG.debug("found: %s", value[0])
-            result = self.add_countries(value[0])
+            result = self._add_countries(value[0])
         elif req.status_code == 401:
             LOG.error("Hatchbuck API code wrong or expired?")
         else:
@@ -161,7 +162,7 @@ class Hatchbuck:
         if req.status_code == requests.codes.ok:  # pylint: disable=no-member
             value = req.json()
             LOG.debug("success: %s", value)
-            return self.add_countries(value)
+            return self._add_countries(value)
         if req.status_code == 401:
             LOG.error("Hatchbuck API code wrong or expired?")
             return None
@@ -173,7 +174,7 @@ class Hatchbuck:
     def create(self, profile):
         """
         Create a new profile
-        :param profile:The profile we want to create
+        :param profile:The profile we want to create, email and status required
         :return:Return the new profile with the new contactID if
         successful or None if fail
         """
@@ -185,7 +186,7 @@ class Hatchbuck:
         if req.status_code == 200:
             value = req.json()
             LOG.debug("success: %s", value)
-            return self.add_countries(value)
+            return self._add_countries(value)
         if req.status_code == 401:
             LOG.error("Hatchbuck API code wrong or expired?")
             return None
@@ -294,15 +295,15 @@ class Hatchbuck:
         for element in profile[dictname]:
             if dictname == "phones":
                 # ignore spaces in phone numbers when comparing
-                return self.cleanup_phone_number(
+                return self._cleanup_phone_number(
                     element[attributename]
-                ) == self.cleanup_phone_number(value)
+                ) == self._cleanup_phone_number(value)
             if element[attributename].lower() == value.lower():
                 return True
         return False
 
     @staticmethod
-    def cleanup_phone_number(value):
+    def _cleanup_phone_number(value):
         """
         remove unneeded characters from phone numbers
         :param value: phone number
@@ -313,7 +314,7 @@ class Hatchbuck:
             value = value.replace(rep, "")
         return value
 
-    def format_phone_number(self, number, country=None):
+    def _format_phone_number(self, number, country=None):
         """
         format phone number in international format
         :param number: phone number
@@ -321,7 +322,9 @@ class Hatchbuck:
         :return: clean phone number
         """
         try:
-            phonenumber = phonenumbers.parse(self.cleanup_phone_number(number), country)
+            phonenumber = phonenumbers.parse(
+                self._cleanup_phone_number(number), country
+            )
             return phonenumbers.format_number(
                 phonenumber, phonenumbers.PhoneNumberFormat.INTERNATIONAL
             )
@@ -336,17 +339,17 @@ class Hatchbuck:
         :return: modified profile
         """
         # check if there is consensus about the contacts country
-        countrycode = self.get_countrycode(profile)
+        countrycode = self._get_countrycode(profile)
 
         for num in list(profile.get("phones", [])):
             # iterate through a copy of the list to be able to delete elements
             # when self.noop is True
-            formatted = self.format_phone_number(num["number"])
+            formatted = self._format_phone_number(num["number"])
             if formatted is None and countrycode is not None:
-                formatted = self.format_phone_number(num["number"], countrycode)
+                formatted = self._format_phone_number(num["number"], countrycode)
             if formatted is None:
                 # local number and unknown country? ignore and continue
-                formatted = self.cleanup_phone_number(num["number"])
+                formatted = self._cleanup_phone_number(num["number"])
             # check if this number is a duplicate
             if any(
                 [
@@ -355,7 +358,7 @@ class Hatchbuck:
                         other["number"] == formatted  # same number
                         or (
                             formatted.startswith("0")  # local number
-                            and self.cleanup_phone_number(other["number"]).endswith(
+                            and self._cleanup_phone_number(other["number"]).endswith(
                                 formatted[1:]
                             )
                         )
@@ -419,7 +422,7 @@ class Hatchbuck:
         return profile
 
     @staticmethod
-    def get_countrycode(profile):
+    def _get_countrycode(profile):
         """
         Extract country code from addresses
         :param profile: contact profile
@@ -449,6 +452,121 @@ class Hatchbuck:
         for email in profile.get("emails", []):
             text += "%s, " % email["address"]
         return "Contact(%s)" % text[:-2]
+
+    def clean_all_addresses(self, profile):
+        """
+        clean and deduplicate all contact addresses
+        :param profile: contact profile
+        :return: cleaned and deduplicated profile
+        """
+
+    def clean_address(self, address):
+        """
+        clean up an address
+        :param address: address dict
+        :return: cleaned up address
+        """
+        if address.get("country", ""):
+            # check if the country is a valid country name
+            # this also fixes two letter country codes
+            try:
+                country = countries.search_fuzzy(
+                    self._clean_country_name(address["country"])
+                )[0].name
+            except LookupError:
+                country = False
+            if country and country != address["country"]:
+                address["country"] = country
+        if re.match(r"^[a-zA-Z]{2}-[0-9]{4,6}$", address.get("zip_code", "")):
+            # zipcode contains country code (e.g. CH-8005)
+            countrycode, zipcode = address["zip_code"].split("-")
+            try:
+                address["country"] = countries.lookup(countrycode).name
+                address["zip_code"] = zipcode
+            except LookupError:
+                pass
+        if (
+            not address.get("street", "")
+            and not address.get("zip_code", "")
+            and address.get("city", "")
+        ):
+            # there is a city but no street/zip
+            # logging.warning(address["city"].split(","))
+            if len(address["city"].split(",")) == 3:
+                # Copenhagen Area, Capital Region, Denmark
+                # Lausanne, Canton de Vaud, Suisse
+                # Vienna, Vienna, Austria
+                try:
+                    address["country"] = countries.search_fuzzy(
+                        self._clean_country_name(address["city"].split(",")[2])
+                    )[0].name
+                    address["city"] = self._clean_city_name(
+                        address["city"].split(",")[0]
+                    )
+                except LookupError:
+                    pass
+            elif len(address["city"].split(",")) == 2:
+                # Zürich und Umgebung, Schweiz
+                # Currais Novos e Região, Brasil
+                # München und Umgebung, Deutschland
+                # Région de Genève, Suisse
+                # Zürich Area, Svizzera
+                try:
+                    address["country"] = countries.search_fuzzy(
+                        self._clean_country_name(address["city"].split(",")[1])
+                    )[0].name
+                    address["city"] = self._clean_city_name(
+                        address["city"].split(",")[0]
+                    )
+                except LookupError:
+                    pass
+            elif len(address["city"].split(",")) == 1:
+                # United States
+                # Switzerland
+                # Luxembourg
+                try:
+                    address["country"] = countries.search_fuzzy(
+                        self._clean_country_name(self._clean_city_name(address["city"]))
+                    )[0].name
+                    address["city"] = ""
+                except LookupError:
+                    pass
+        return address
+
+    @staticmethod
+    def _clean_country_name(country):
+        """
+        look up country names not covered by pycountry
+        :param country: country
+        :return: clean country name
+        """
+        country = country.strip()
+        mapping = {
+            "suisse": "Switzerland",
+            "svizzera": "Switzerland",
+            "schweiz": "Switzerland",
+            "deutschland": "Germany",
+            "brasil": "Brazil",
+        }
+        return mapping.get(country.lower(), country)
+
+    @staticmethod
+    def _clean_city_name(city):
+        """
+        remove "area", "region" words from city names
+        :param city: city name
+        :return: clean city name
+        """
+        for word in [
+            " area",
+            " Area",
+            "Greater ",
+            "und Umgebung",
+            "e Região",
+            "Région de",
+        ]:
+            city = city.replace(word, "")
+        return city.strip()
 
     def profile_add(
         self, profile, dictname, attributename, valuelist, moreattributes=None
@@ -508,7 +626,7 @@ class Hatchbuck:
                         )
                         return profile
                 elif dictname == "phones" and attributename == "number":
-                    value = self.cleanup_phone_number(value)
+                    value = self._cleanup_phone_number(value)
                 if moreattributes is not None:
                     for key in moreattributes:
                         updateprofile[dictname][0][key] = moreattributes[key]

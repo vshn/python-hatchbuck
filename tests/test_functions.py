@@ -75,7 +75,8 @@ class TestHatchbuck(unittest.TestCase):
         pass
 
     def test_profile_add_address(self):
-        hatchbuck = Hatchbuck("abc123")
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
         existingaddress = {
             "street": "Neugasse 10",
             "zip_code": "8005",
@@ -150,7 +151,8 @@ class TestHatchbuck(unittest.TestCase):
         # }))
 
     def test_profile_contains(self):
-        hatchbuck = Hatchbuck("abc123")
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
         profile = hatchbuck.profile_contains(
             {
                 "contactId": "SUFYbGdOaEQ0cWR2N1JfV183U"
@@ -164,14 +166,16 @@ class TestHatchbuck(unittest.TestCase):
         self.assertTrue(profile, testProfile)
 
     def test_add_tag(self):
-        hatchbuck = Hatchbuck("abc123")
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
         profile = hatchbuck.add_tag(
             "SUFYbGdOaEQ0cWR2N1JfV183UFNBSDllTktCc3E3OWRsN09qaW4tU3JqbzE1", ""
         )
         self.assertFalse(profile, testProfile)
 
     def test_profile_add_birthday(self):
-        hatchbuck = Hatchbuck("abc123")
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
         profile = hatchbuck.profile_add_birthday(
             {
                 "contactId": "TmpmT0QyUGE3UGdGejZMay1x"
@@ -183,32 +187,36 @@ class TestHatchbuck(unittest.TestCase):
 
     def test_cleanup_phone_number(self):
         hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
         self.assertEqual(
-            hatchbuck.cleanup_phone_number("+41 (44) 545-53-00"), "+41445455300"
-        )
-        self.assertEqual(hatchbuck.cleanup_phone_number("+41445455300"), "+41445455300")
-        self.assertEqual(
-            hatchbuck.cleanup_phone_number("+41 44 545 53 00"), "+41445455300"
+            hatchbuck._cleanup_phone_number("+41 (44) 545-53-00"), "+41445455300"
         )
         self.assertEqual(
-            hatchbuck.cleanup_phone_number("\xa0+41 44 545 53 00\xa0"), "+41445455300"
+            hatchbuck._cleanup_phone_number("+41445455300"), "+41445455300"
+        )
+        self.assertEqual(
+            hatchbuck._cleanup_phone_number("+41 44 545 53 00"), "+41445455300"
+        )
+        self.assertEqual(
+            hatchbuck._cleanup_phone_number("\xa0+41 44 545 53 00\xa0"), "+41445455300"
         )
 
     def test_format_phone_number(self):
         hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
         self.assertEqual(
-            hatchbuck.format_phone_number("+41445455300"), "+41 44 545 53 00"
+            hatchbuck._format_phone_number("+41445455300"), "+41 44 545 53 00"
         )
         self.assertEqual(
-            hatchbuck.format_phone_number("\xa0+41(44)545-53-00\xa0"),
+            hatchbuck._format_phone_number("\xa0+41(44)545-53-00\xa0"),
             "+41 44 545 53 00",
         )
         self.assertEqual(
-            hatchbuck.format_phone_number("+41 44 545 53 00"), "+41 44 545 53 00"
+            hatchbuck._format_phone_number("+41 44 545 53 00"), "+41 44 545 53 00"
         )
-        self.assertEqual(hatchbuck.format_phone_number("044 545 53 00"), None)
+        self.assertEqual(hatchbuck._format_phone_number("044 545 53 00"), None)
         self.assertEqual(
-            hatchbuck.format_phone_number("044 545 53 00", "CH"), "+41 44 545 53 00"
+            hatchbuck._format_phone_number("044 545 53 00", "CH"), "+41 44 545 53 00"
         )
 
     def test_clean_all_phone_numbers(self):
@@ -277,6 +285,7 @@ class TestHatchbuck(unittest.TestCase):
 
     def test_short_contact(self):
         hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
         self.assertEqual(
             hatchbuck.short_contact(testProfile),
             "Contact(Bashar Said, bashar.said@vshn.ch)",
@@ -295,14 +304,471 @@ class TestHatchbuck(unittest.TestCase):
 
     def test_get_countrycode(self):
         hatchbuck = Hatchbuck("")
-        self.assertEqual(hatchbuck.get_countrycode(testProfile), "CH")  # unique country
-        self.assertEqual(hatchbuck.get_countrycode({}), None)  # no country
+        hatchbuck.noop = True
         self.assertEqual(
-            hatchbuck.get_countrycode(
+            hatchbuck._get_countrycode(testProfile), "CH"
+        )  # unique country
+        self.assertEqual(hatchbuck._get_countrycode({}), None)  # no country
+        self.assertEqual(
+            hatchbuck._get_countrycode(
                 {"addresses": [{"country": "Switzerland"}, {"country": "Germany"}]}
             ),
             None,
         )  # ambiguous country
+
+    def test_clean_all_addresses(self):
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
+
+    def test_clean_address(self):
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "Neugasse 10",
+                    "zip_code": "8005",
+                    "city": "Zürich",
+                    "country": "Switzerland",
+                }
+            ),
+            {
+                "street": "Neugasse 10",
+                "zip_code": "8005",
+                "city": "Zürich",
+                "country": "Switzerland",
+            },
+        )  # no change
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Zürich, Canton of Zürich, Switzerland",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Zürich", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Bern, Canton of Bern, Switzerland",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Bern", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Neuenkirch, Kanton Luzern, Schweiz",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Neuenkirch",
+                "country": "Switzerland",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Frankfurt Am Main Area, Germany",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Frankfurt Am Main",
+                "country": "Germany",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Sankt Gallen Area, Switzerland",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Sankt Gallen",
+                "country": "Switzerland",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Santa Monica, California",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Santa Monica",
+                "country": "United States",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "San Francisco Bay Area",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "San Francisco Bay Area",
+                "country": "",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {"street": "", "zip_code": "", "city": "Austria area", "country": ""}
+            ),
+            {"street": "", "zip_code": "", "city": "", "country": "Austria"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Vienna, Vienna, Austria",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Vienna", "country": "Austria"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Wohlen AG, Kanton Aargau, Schweiz",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Wohlen AG",
+                "country": "Switzerland",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Austin, Texas Area",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Austin, Texas Area", "country": ""},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Greater New York City Area",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Greater New York City Area",
+                "country": "",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {"street": "", "zip_code": "", "city": "Switzerland", "country": ""}
+            ),
+            {"street": "", "zip_code": "", "city": "", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Helsinki Area, Finland",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Helsinki", "country": "Finland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {"street": "", "zip_code": "", "city": "United States", "country": ""}
+            ),
+            {"street": "", "zip_code": "", "city": "", "country": "United States"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Zürich Area, Switzerland",
+                    "country": "ch",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Zürich", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Zürich Area, Switzerland",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Zürich", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Brisbane Area, Australia",
+                    "country": "au",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Brisbane", "country": "Australia"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Amsterdam Area, Netherlands",
+                    "country": "nl",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Amsterdam",
+                "country": "Netherlands",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Brisbane Area, Australia",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Brisbane", "country": "Australia"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {"street": "", "zip_code": "", "city": "", "country": "CH"}
+            ),
+            {"street": "", "zip_code": "", "city": "", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "Pflanzschulstrasse 34",
+                    "zip_code": "CH-8004",
+                    "city": "Zürich",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "Pflanzschulstrasse 34",
+                "zip_code": "8004",
+                "city": "Zürich",
+                "country": "Switzerland",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Zürich Area, Svizzera",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Zürich", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {"street": "", "zip_code": "", "city": "Luxembourg", "country": ""}
+            ),
+            {"street": "", "zip_code": "", "city": "", "country": "Luxembourg"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Boulogne-Billancourt, Île-de-France, France",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Boulogne-Billancourt",
+                "country": "France",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Lausanne, Canton de Vaud, Suisse",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Lausanne",
+                "country": "Switzerland",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Région de Lausanne, Suisse",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Lausanne",
+                "country": "Switzerland",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Région de Genève, Suisse",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Genève", "country": "Switzerland"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Copenhagen, Capital Region, Denmark",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Copenhagen", "country": "Denmark"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Copenhagen Area, Capital Region, Denmark",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Copenhagen", "country": "Denmark"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "München und Umgebung, Deutschland",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "München", "country": "Germany"},
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Currais Novos e Região, Brasil",
+                    "country": "",
+                }
+            ),
+            {
+                "street": "",
+                "zip_code": "",
+                "city": "Currais Novos",
+                "country": "Brazil",
+            },
+        )
+        self.assertEqual(
+            hatchbuck.clean_address(
+                {
+                    "street": "",
+                    "zip_code": "",
+                    "city": "Zürich und Umgebung, Schweiz",
+                    "country": "",
+                }
+            ),
+            {"street": "", "zip_code": "", "city": "Zürich", "country": "Switzerland"},
+        )
+
+    def test_clean_city_name(self):
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
+        self.assertEqual(
+            hatchbuck._clean_city_name("Greater New York City Area"), "New York City"
+        )
+        self.assertEqual(hatchbuck._clean_city_name("Greater Atlanta Area"), "Atlanta")
+        self.assertEqual(hatchbuck._clean_city_name("Zürich und Umgebung"), "Zürich")
+        self.assertEqual(
+            hatchbuck._clean_city_name("Currais Novos e Região"), "Currais Novos"
+        )
+        self.assertEqual(hatchbuck._clean_city_name("München und Umgebung"), "München")
+        self.assertEqual(hatchbuck._clean_city_name("Région de Genève"), "Genève")
+        self.assertEqual(hatchbuck._clean_city_name("Zürich Area"), "Zürich")
+
+    def test_clean_country_name(self):
+        hatchbuck = Hatchbuck("")
+        hatchbuck.noop = True
+        self.assertEqual(
+            hatchbuck._clean_country_name("Germany"), "Germany"
+        )  # no change
+        self.assertEqual(hatchbuck._clean_country_name("Suisse"), "Switzerland")
+        self.assertEqual(hatchbuck._clean_country_name("Svizzera"), "Switzerland")
+        self.assertEqual(hatchbuck._clean_country_name("Schweiz"), "Switzerland")
+        self.assertEqual(hatchbuck._clean_country_name("Deutschland"), "Germany")
+        self.assertEqual(hatchbuck._clean_country_name("Brasil"), "Brazil")
 
 
 if __name__ == "__main__":
