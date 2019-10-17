@@ -1,5 +1,6 @@
 from hatchbuck import Hatchbuck
 import unittest
+import copy
 
 
 class TestHatchbuck(unittest.TestCase):
@@ -9,16 +10,12 @@ class TestHatchbuck(unittest.TestCase):
             {
                 "city": "Zürich",
                 "country": "Switzerland",
-                "countryId": "QmJzeldzQ25rbXluZG"
-                "c4RzlDYmFmYlZOY2xTemMwX2"
-                "ZoMll5UTJPenhsNDE1",
-                "id": "Q0NjajF2U1lTWnBHM1hjRFlnQzhzMH" "Z2UUxLY2d6a1JaU3Nicm5hRTN6azE1",
+                "countryId": "QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1",
+                "id": "Q0NjajF2U1lTWnBHM1hjRFlnQzhzMHZ2UUxLY2d6a1JaU3Nicm5hRTN6azE1",
                 "state": "ZH",
                 "street": "Neugasse 10",
                 "type": "Work",
-                "typeId": "SjFENlU0Y2s2RDFpM0NKWEExRm"
-                "VvSjZ4T3NJMG5pLWNYZjRse"
-                "DBSaTVfVTE1",
+                "typeId": "SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1",
                 "zip": "8005",
             }
         ],
@@ -36,11 +33,9 @@ class TestHatchbuck(unittest.TestCase):
         "emails": [
             {
                 "address": "bashar.said@vshn.ch",
-                "id": "S2lIY2NOS2dBRnRCamEyQU" "ZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1",
+                "id": "S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1",
                 "type": "Work",
-                "typeId": "VmhlQU1pZVJSUFFJSjZfM"
-                "HRmT1laUmwtT0FMNW9hbnBuZHd"
-                "2Q1JTdE0tYzE1",
+                "typeId": "VmhlQU1pZVJSUFFJSjZfMHRmT1laUmwtT0FMNW9hbnBuZHd2Q1JTdE0tYzE1",
             }
         ],
         "firstName": "Bashar",
@@ -48,12 +43,10 @@ class TestHatchbuck(unittest.TestCase):
         "lastName": "Said",
         "phones": [
             {
-                "id": "OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4T" "VppZlF4NklrNmZfSnBhaDZwQTE1",
+                "id": "OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4TVppZlF4NklrNmZfSnBhaDZwQTE1",
                 "number": "+(414) 454-5 53 00",
                 "type": "Work",
-                "typeId": "QTBncHV0dndnaGNnRVMzLTR0SGtF"
-                "RmRvZjdqNm4zcVphQi1XX1Z2MXV"
-                "tRTE1",
+                "typeId": "QTBncHV0dndnaGNnRVMzLTR0SGtFRmRvZjdqNm4zcVphQi1XX1Z2MXVtRTE1",
             }
         ],
         "referredBy": "",
@@ -64,9 +57,8 @@ class TestHatchbuck(unittest.TestCase):
         "socialNetworks": [
             {
                 "address": "https://twitter.com/bashar_2018",
-                "id": "S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg" "5Z3piMERVbEFsam42azE1",
-                "typeId": "ZGRlMHpBaXY3M05YUGc4a0pIY3lRdUFKN1JYa"
-                "Dd2VEphbzhSRkdzM2x4bzE1",
+                "id": "S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg5Z3piMERVbEFsam42azE1",
+                "typeId": "ZGRlMHpBaXY3M05YUGc4a0pIY3lRdUFKN1JYaDd2VEphbzhSRkdzM2x4bzE1",
             }
         ],
     }
@@ -759,8 +751,7 @@ class TestHatchbuck(unittest.TestCase):
         self.assertEqual(hatchbuck._clean_city_name("Zürich Area"), "Zürich")
 
     def test_clean_country_name(self):
-        hatchbuck = Hatchbuck("")
-        hatchbuck.noop = True
+        hatchbuck = Hatchbuck("", noop=True)
         self.assertEqual(
             hatchbuck._clean_country_name("Germany"), "Germany"
         )  # no change
@@ -769,6 +760,255 @@ class TestHatchbuck(unittest.TestCase):
         self.assertEqual(hatchbuck._clean_country_name("Schweiz"), "Switzerland")
         self.assertEqual(hatchbuck._clean_country_name("Deutschland"), "Germany")
         self.assertEqual(hatchbuck._clean_country_name("Brasil"), "Brazil")
+
+    def test_safe_update(self):
+        hatchbuck = Hatchbuck("", noop=True)
+        self.maxDiff = None
+
+        # top level fields
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["firstName"] = "Hello"
+        changedprofile["lastName"] = "World"
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile, {"firstName": "Hello", "lastName": "World"}
+            ),
+            changedprofile,
+        )
+
+        # field with dict
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["salesRep"] = {"username": "hello.world"}
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile, {"salesRep": {"username": "hello.world"}}
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, update by id
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["emails"] = [
+            {
+                "address": "test@vshn.ch",
+                "id": "S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1",
+                "type": "Work",
+                "typeId": "VmhlQU1pZVJSUFFJSjZfMHRmT1laUmwtT0FMNW9hbnBuZHd2Q1JTdE0tYzE1",
+            }
+        ]
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {
+                    "emails": [
+                        {
+                            "address": "test@vshn.ch",
+                            "id": "S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5Z"
+                            "FVENGVHTG1DODE1",
+                        }
+                    ]
+                },
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, deleting empty by id
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["emails"] = []
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {
+                    "emails": [
+                        {
+                            "address": "",
+                            "id": "S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5Z"
+                            "FVENGVHTG1DODE1",
+                        }
+                    ]
+                },
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, deleting empty by id
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["addresses"] = []
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {
+                    "addresses": [
+                        {
+                            "id": "Q0NjajF2U1lTWnBHM1hjRFlnQzhzMHZ2UUxLY2d6a1JaU"
+                            "3Nicm5hRTN6azE1",
+                            "city": "",
+                            "country": "",
+                            "state": "",
+                            "street": "",
+                            "zip": "",
+                        }
+                    ]
+                },
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, deleting empty by id
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["phones"] = []
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {
+                    "phones": [
+                        {
+                            "number": "",
+                            "id": "OHh4U0ZWc3FNVXVBQVF4cjdsak9McWc4TVppZlF4NklrN"
+                            "mZfSnBhaDZwQTE1",
+                        }
+                    ]
+                },
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, deleting empty by id
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["socialNetworks"] = []
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {
+                    "socialNetworks": [
+                        {
+                            "address": "",
+                            "id": "S1pEM2NMWlhmZ1VUcDhTUWVvQy1kU21xMjlSbDg5Z3piM"
+                            "ERVbEFsam42azE1",
+                        }
+                    ]
+                },
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, adding new
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["emails"] = [
+            {
+                "address": "bashar.said@vshn.ch",
+                "id": "S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1",
+                "type": "Work",
+                "typeId": "VmhlQU1pZVJSUFFJSjZfMHRmT1laUmwtT0FMNW9hbnBuZHd2Q1JTdE0tYzE1",
+            },
+            {"address": "test@vshn.ch", "type": "Home"},
+        ]
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {"emails": [{"address": "test@vshn.ch", "type": "Home"}]},
+            ),
+            changedprofile,
+        )
+        # field with list of dict, updating by listdictkey
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["emails"] = [
+            {
+                "address": "bashar.said@vshn.ch",
+                "id": "S2lIY2NOS2dBRnRCamEyQUZxTG00dzhlYjAxUU9Sa3Z5ZFVENGVHTG1DODE1",
+                "type": "Home",
+                "typeId": "VmhlQU1pZVJSUFFJSjZfMHRmT1laUmwtT0FMNW9hbnBuZHd2Q1JTdE0tYzE1",
+            }
+        ]
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {"emails": [{"address": "bashar.said@vshn.ch", "type": "Home"}]},
+            ),
+            changedprofile,
+        )
+        # field with list of dict, not adding empty address
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {
+                    "addresses": [
+                        {
+                            "city": "",
+                            "country": "",
+                            "state": "",
+                            "street": "",
+                            "zip": "",
+                        }
+                    ]
+                },
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, not adding empty address
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile,
+                {
+                    "addresses": [
+                        {
+                            "city": "",
+                            "country": "",
+                            "state": "",
+                            "street": "",
+                            "zip": "",
+                        }
+                    ]
+                },
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, not adding empty/incomplete email
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        self.assertEqual(
+            hatchbuck.safe_update(
+                originalprofile, {"emails": [{"address": "", "type": "Home"}]}
+            ),
+            changedprofile,
+        )
+
+        # field with list of dict, adding incomplete address
+        originalprofile = copy.deepcopy(testProfile)
+        changedprofile = copy.deepcopy(testProfile)
+        changedprofile["addresses"] = [
+            {
+                "city": "Zürich",
+                "country": "Switzerland",
+                "countryId": "QmJzeldzQ25rbXluZGc4RzlDYmFmYlZOY2xTemMwX2ZoMll5UTJPenhsNDE1",
+                "id": "Q0NjajF2U1lTWnBHM1hjRFlnQzhzMHZ2UUxLY2d6a1JaU3Nicm5hRTN6azE1",
+                "state": "ZH",
+                "street": "Neugasse 10",
+                "type": "Work",
+                "typeId": "SjFENlU0Y2s2RDFpM0NKWEExRmVvSjZ4T3NJMG5pLWNYZjRseDBSaTVfVTE1",
+                "zip": "8005",
+            },
+            {"city": "Zürich", "country": "", "state": "", "street": "", "zip": ""},
+        ]
+        self.assertEqual(
+            hatchbuck.safe_update(originalprofile, {"addresses": [{"city": "Zürich"}]}),
+            changedprofile,
+        )
 
 
 if __name__ == "__main__":

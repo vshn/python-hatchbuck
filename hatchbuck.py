@@ -144,6 +144,124 @@ class Hatchbuck:
                 break
         return result
 
+    def silent_update(self, profile, update):
+        """
+        update a profile, respecting noop, and return the updated profile
+
+        if an error happens (invalid data or api token) the _unmodified profile_
+        is returned and the error message logged
+        :param profile: profile dict with contactId
+        :param update: the dict key(s) to update/overwrite (basically the diff)
+        :return: updated profile
+        """
+        newprofile = self.safe_update(profile, update)
+        if newprofile is None:
+            return profile
+        return newprofile
+
+    def safe_update(self, profile, update):  # pylint: disable=too-many-branches
+        """
+        update a profile, respecting noop, and return the updated profile
+
+        if self.noop is True no update will be done to hatchbuck.com and
+        this function tries to simulate what would happen
+        :param profile: profile dict with contactId
+        :param update: the dict key(s) to update/overwrite (basically the diff)
+        :return: updated profile
+        """
+        # logging.warning("safe_update %s %s", profile, update)
+        if not self.noop:
+            return self.update(profile["contactId"], update)
+
+        # for these list-of-dicts: if the dict fields with these names are empty the
+        # whole dict is removed
+        listdictkeys = {
+            "emails": ["address"],
+            "addresses": ["city", "country", "state", "street", "zip"],
+            # "customFields": ["value"], # custom fields are empty, not deleted
+            "phones": ["number"],
+            "socialNetworks": ["address"],
+        }
+
+        for key in update:  # pylint: disable=too-many-branches,too-many-nested-blocks
+            if isinstance(update[key], str):
+                # simple field like firstName, lastName etc
+                # logging.warning("str %s", update[key])
+                profile[key] = update[key]
+            elif isinstance(update[key], dict):
+                # dict like salesRep
+                # logging.warning("dict %s", update[key])
+                # for subkey in update[key]:
+                #    profile[key][subkey] = update[key][subkey]
+                # actually replace the whole dict, since we don't know the new id
+                # of the new sales rep we'll just leave it out
+                profile[key] = update[key]
+            elif isinstance(update[key], list):
+                # list of dicts like "emails", "addresses" etc
+                # logging.warning("list %s", update[key])
+                for item in update[key]:
+                    # logging.warning("item %s", item)
+                    if item.get("id", False):
+                        # if there is an existing id in the update lets use that
+                        lookforfield = ["id"]
+                    elif listdictkeys.get(key, False) and all(
+                        [item.get(impkey, False) for impkey in listdictkeys[key]]
+                    ):
+                        # if the update contains all listdictkeys lets try to find this
+                        lookforfield = listdictkeys[key]
+                    else:
+                        # we can't identify if this is a potential duplicate/update
+                        # this is mostly a case for (incomplete) addresses
+                        # as all the other types (emails, phones, etc) without the
+                        # primary listdictkey information (email address, phone number,
+                        # etc) would not be accepted by hatchbuck.
+                        # we'll add incomplete addresses (at least one field needs to
+                        # be nonempty, making sure all the fields are present)
+                        # and ignore other updates (emails, phones, social)
+                        if key == "addresses" and any(
+                            [item.get(field, False) for field in listdictkeys[key]]
+                        ):
+                            for field in listdictkeys[key]:
+                                if field not in item:
+                                    item[field] = ""
+                            profile[key].append(item)
+                        break
+
+                    # find the corresponding id element in profile
+                    found = False
+                    for listitem in range(len(profile[key])):
+                        # iterate over the list offset to re-use the offset for
+                        # update or delete later
+                        if all(
+                            [
+                                profile[key][listitem].get(impkey) == item.get(impkey)
+                                for impkey in lookforfield
+                            ]
+                        ):
+                            found = listitem
+                            # logging.warning("found %s", found)
+                            break
+
+                    if found is not False:
+                        if listdictkeys.get(key, False) and all(
+                            [item.get(impkey, "") == "" for impkey in listdictkeys[key]]
+                        ):
+                            # all the "primary key" fields are empty,
+                            # that means the entry should be deleted
+                            # logging.warning("deleting %s", found)
+                            del profile[key][found]
+                        else:
+                            for subkey in item:
+                                # logging.warning("setting %s", subkey)
+                                profile[key][found][subkey] = item[subkey]
+                    else:
+                        # didn't find a matching list entry -> add
+                        profile[key].append(item)
+            else:
+                logging.warning("safe_update: unknown field type in %s", update[key])
+
+        return profile
+
     def update(self, contact_id, profile):
         """
         Update an existing contact
@@ -374,21 +492,10 @@ class Hatchbuck:
                     self.short_contact(profile),
                     num["number"],
                 )
-                if self.noop:
-                    profile["phones"].remove(num)
-                else:
-                    newprofile = self.update(
-                        profile["contactId"],
-                        {
-                            "phones": [
-                                {"number": "", "id": num["id"], "type": num["type"]}
-                            ]
-                        },
-                    )
-                    if newprofile is not None:
-                        # if the update was successful continue working
-                        # with the new profile
-                        profile = newprofile
+                profile = self.silent_update(
+                    profile,
+                    {"phones": [{"number": "", "id": num["id"], "type": num["type"]}]},
+                )
 
             elif formatted != num["number"]:
                 # the number was updated
@@ -397,25 +504,14 @@ class Hatchbuck:
                     self.short_contact(profile),
                     formatted,
                 )
-                if self.noop:
-                    num["number"] = formatted
-                else:
-                    newprofile = self.update(
-                        profile["contactId"],
-                        {
-                            "phones": [
-                                {
-                                    "number": formatted,
-                                    "id": num["id"],
-                                    "type": num["type"],
-                                }
-                            ]
-                        },
-                    )
-                    if newprofile is not None:
-                        # if the update was successful continue working
-                        # with the new profile
-                        profile = newprofile
+                profile = self.silent_update(
+                    profile,
+                    {
+                        "phones": [
+                            {"number": formatted, "id": num["id"], "type": num["type"]}
+                        ]
+                    },
+                )
             else:
                 # number was not changed
                 pass
@@ -459,6 +555,20 @@ class Hatchbuck:
         :param profile: contact profile
         :return: cleaned and deduplicated profile
         """
+        for address in list(profile.get("addresses", [])):
+            # iterate through a copy of the
+            new = self.clean_address(address)
+            if new != address:
+                # there was an update
+                logging.debug(
+                    "%s: updating address to %s", self.short_contact(profile), new
+                )
+                if not self.noop:
+                    updated = self.update(profile["contactId"], {"addresses": [new]})
+                    if updated is not None:
+                        profile = updated
+                else:
+                    pass
 
     def clean_address(self, address):
         """
@@ -528,6 +638,7 @@ class Hatchbuck:
                     address["country"] = countries.search_fuzzy(
                         self._clean_country_name(self._clean_city_name(address["city"]))
                     )[0].name
+                    # if the lookup is successful this is a country name, not city name
                     address["city"] = ""
                 except LookupError:
                     pass
