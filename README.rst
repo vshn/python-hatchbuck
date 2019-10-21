@@ -10,9 +10,9 @@ This python package provides an easy to use python module to interact with the
 .. |latest-version| image:: https://img.shields.io/pypi/v/hatchbuck.svg
    :alt: Latest version on PyPI
    :target: https://pypi.org/project/hatchbuck
-.. |build-status| image:: https://img.shields.io/travis/vshn/python-hatchbuck/master.svg
+.. |build-status| image:: https://travis-ci.com/vshn/python-hatchbuck.svg?branch=master
    :alt: Build status
-   :target: https://travis-ci.org/vshn/python-hatchbuck
+   :target: https://travis-ci.com/vshn/python-hatchbuck
 .. |python-support| image:: https://img.shields.io/pypi/pyversions/hatchbuck.svg
    :alt: Python versions
    :target: https://pypi.org/project/hatchbuck
@@ -652,4 +652,3 @@ When combining data from multiple sources multiple phone numbers pile up in the 
     # being the same number in international and national formats
     profile = hatchbuck.clean_all_phone_numbers(profile)
     # the redundant local number is removed and the international number is formatted as "+41 44 545 53 00"
-

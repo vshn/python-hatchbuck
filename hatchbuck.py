@@ -5,6 +5,8 @@ Hatchbuck.com CRM API bindings for Python
 import datetime
 import json
 import logging
+import re
+import copy
 
 import phonenumbers
 import pkg_resources
@@ -24,6 +26,14 @@ class Hatchbuck:
     noop = False
     hatchbuck_countries = None
 
+    listdictkeys = {
+        "emails": ["address"],
+        "addresses": ["country", "state", "city", "zip", "street"],
+        # "customFields": ["value"], # custom fields are empty, not deleted
+        "phones": ["number"],
+        "socialNetworks": ["address"],
+    }
+
     def __init__(self, key, noop=False):
         """
         Initialize API session with settings for the whole session
@@ -33,7 +43,7 @@ class Hatchbuck:
         self.key = key
         self.noop = noop
 
-    def country_lookup(self, country_id):
+    def _country_lookup(self, country_id):
         """
         look up the country name by country ID, parsing and caching the table on first lookup
         :param country_id: the hatchbuck country ID to get the name for
@@ -60,10 +70,12 @@ class Hatchbuck:
         :param address: dict containing 'countryId' key
         :return: the dict with an additional 'country' key
         """
-        address["country"] = self.country_lookup(address.get("countryId", None))
+        address["country"] = self._country_lookup(address.get("countryId", None))
+        if address.get("countryId", False):
+            del address["countryId"]
         return address
 
-    def add_countries(self, profile):
+    def _add_countries(self, profile):
         """
         add the country name to all addresses in the profile
         :param profile: hatchbuck profile dict
@@ -90,7 +102,7 @@ class Hatchbuck:
             for profile in req.json():
                 if self.profile_contains(profile, "emails", "address", email):
                     LOG.debug("found: %s", profile)
-                    result = self.add_countries(profile)
+                    result = self._add_countries(profile)
                 else:
                     LOG.debug("found profile without matching address: %s", profile)
                     continue
@@ -118,7 +130,7 @@ class Hatchbuck:
         if req.status_code == 200:
             value = req.json()
             LOG.debug("found: %s", value[0])
-            result = self.add_countries(value[0])
+            result = self._add_countries(value[0])
         elif req.status_code == 401:
             LOG.error("Hatchbuck API code wrong or expired?")
         else:
@@ -143,6 +155,122 @@ class Hatchbuck:
                 break
         return result
 
+    def silent_update(self, profile, update):
+        """
+        update a profile, respecting noop, and return the updated profile
+
+        if an error happens (invalid data or api token) the _unmodified profile_
+        is returned and the error message logged
+        :param profile: profile dict with contactId
+        :param update: the dict key(s) to update/overwrite (basically the diff)
+        :return: updated profile
+        """
+        newprofile = self.safe_update(profile, update)
+        if newprofile is None:
+            return profile
+        return newprofile
+
+    def safe_update(self, profile, update):  # pylint: disable=too-many-branches
+        """
+        update a profile, respecting noop, and return the updated profile
+
+        if self.noop is True no update will be done to hatchbuck.com and
+        this function tries to simulate what would happen
+        :param profile: profile dict with contactId
+        :param update: the dict key(s) to update/overwrite (basically the diff)
+        :return: updated profile
+        """
+        # logging.warning("safe_update %s %s", profile, update)
+        if not self.noop:
+            return self.update(profile["contactId"], update)
+
+        # for these list-of-dicts: if the dict fields with these names are empty the
+        # whole dict is removed
+
+        for key in update:  # pylint: disable=too-many-branches,too-many-nested-blocks
+            if isinstance(update[key], str):
+                # simple field like firstName, lastName etc
+                # logging.warning("str %s", update[key])
+                profile[key] = update[key]
+            elif isinstance(update[key], dict):
+                # dict like salesRep
+                # logging.warning("dict %s", update[key])
+                # for subkey in update[key]:
+                #    profile[key][subkey] = update[key][subkey]
+                # actually replace the whole dict, since we don't know the new id
+                # of the new sales rep we'll just leave it out
+                profile[key] = update[key]
+            elif isinstance(update[key], list):
+                # list of dicts like "emails", "addresses" etc
+                # logging.warning("list %s", update[key])
+                for item in update[key]:
+                    # logging.warning("item %s", item)
+                    if item.get("id", False):
+                        # if there is an existing id in the update lets use that
+                        lookforfield = ["id"]
+                    elif self.listdictkeys.get(key, False) and all(
+                        [item.get(impkey, False) for impkey in self.listdictkeys[key]]
+                    ):
+                        # if the update contains all listdictkeys lets try to find this
+                        lookforfield = self.listdictkeys[key]
+                    else:
+                        # we can't identify if this is a potential duplicate/update
+                        # this is mostly a case for (incomplete) addresses
+                        # as all the other types (emails, phones, etc) without the
+                        # primary listdictkey information (email address, phone number,
+                        # etc) would not be accepted by hatchbuck.
+                        # we'll add incomplete addresses (at least one field needs to
+                        # be nonempty, making sure all the fields are present)
+                        # and ignore other updates (emails, phones, social)
+                        # if the address is a duplicate it will be deduplicated in
+                        # clean_all_addresses, which we don't call now
+                        if key == "addresses" and any(
+                            [item.get(field, False) for field in self.listdictkeys[key]]
+                        ):
+                            for field in self.listdictkeys[key]:
+                                if field not in item:
+                                    item[field] = ""
+                            profile[key].append(item)
+                        break
+
+                    # find the corresponding id element in profile
+                    found = False
+                    for listitem in range(len(profile[key])):
+                        # iterate over the list offset to re-use the offset for
+                        # update or delete later
+                        if all(
+                            [
+                                profile[key][listitem].get(impkey) == item.get(impkey)
+                                for impkey in lookforfield
+                            ]
+                        ):
+                            found = listitem
+                            # logging.warning("found %s", found)
+                            break
+
+                    if found is not False:
+                        if self.listdictkeys.get(key, False) and all(
+                            [
+                                item.get(impkey, "") == ""
+                                for impkey in self.listdictkeys[key]
+                            ]
+                        ):
+                            # all the "primary key" fields are empty,
+                            # that means the entry should be deleted
+                            # logging.warning("deleting %s", found)
+                            del profile[key][found]
+                        else:
+                            for subkey in item:
+                                # logging.warning("setting %s", subkey)
+                                profile[key][found][subkey] = item[subkey]
+                    else:
+                        # didn't find a matching list entry -> add
+                        profile[key].append(item)
+            else:
+                logging.warning("safe_update: unknown field type in %s", update[key])
+
+        return profile
+
     def update(self, contact_id, profile):
         """
         Update an existing contact
@@ -161,7 +289,7 @@ class Hatchbuck:
         if req.status_code == requests.codes.ok:  # pylint: disable=no-member
             value = req.json()
             LOG.debug("success: %s", value)
-            return self.add_countries(value)
+            return self._add_countries(value)
         if req.status_code == 401:
             LOG.error("Hatchbuck API code wrong or expired?")
             return None
@@ -173,7 +301,7 @@ class Hatchbuck:
     def create(self, profile):
         """
         Create a new profile
-        :param profile:The profile we want to create
+        :param profile:The profile we want to create, email and status required
         :return:Return the new profile with the new contactID if
         successful or None if fail
         """
@@ -185,12 +313,49 @@ class Hatchbuck:
         if req.status_code == 200:
             value = req.json()
             LOG.debug("success: %s", value)
-            return self.add_countries(value)
+            return self._add_countries(value)
         if req.status_code == 401:
             LOG.error("Hatchbuck API code wrong or expired?")
             return None
         LOG.debug("fail: %s", req.text)
         return None
+
+    def add_address(
+        self,
+        profile,
+        street="",
+        zipcode="",
+        city="",
+        state="",
+        country="",
+        addresstype="Work",
+    ):  # pylint: disable=too-many-arguments,too-many-branches
+        """
+        Add street address to profile and return updated profile
+        :param profile: profile to add address to
+        :param street: street name and number
+        :param zipcode: zip code
+        :param city: city
+        :param state: state
+        :param country: country (preferably english version)
+        :param addresstype: "Work", "Home" or "Other"
+        :return: updated profile
+        """
+        update = self._clean_address(
+            {
+                "street": street,
+                "zip": zipcode,
+                "city": city,
+                "state": state,
+                "country": country,
+                "type": addresstype,
+            }
+        )
+        for address in profile.get("addresses", []):
+            if self._address_obsolete(update, address):
+                # don't add the address if it is obsolete
+                return profile
+        return self.silent_update(profile, {"addresses": [update]})
 
     def profile_add_address(self, profile, address, addresstype):
         """
@@ -200,41 +365,15 @@ class Hatchbuck:
         :return: Return the profile after adding the address to it
 
         """
-        # try to convert the country name from a two-letter abbreviation
-        try:
-            country = countries.get(alpha2=address["country"]).name
-        except KeyError:
-            country = address["country"]
-
-        # convert the dict field names to hatchbuck names
-        update = {
-            "street": address["street"],
-            "zip": address["zip_code"],
-            "city": address["city"],
-            "country": country,
-            "type": addresstype,
-        }
-
-        # check that there is at least one field that is not empty
-        notempty = False
-        for key in ["street", "zip", "city", "country"]:
-            if update[key] is not None and update[key] != "":
-                notempty = True
-        if not notempty:
-            return profile
-
-        if "addresses" not in profile:
-            profile["addresses"] = []
-
-        if not self.address_exists(profile, update):
-            updated = self.update(profile["contactId"], {"addresses": [update]})
-            if updated is None:
-                # update failed or noope'd
-                return profile
-            # return the new profile including the new address
-            return updated
-        # the profile is complete
-        return profile
+        return self.add_address(
+            profile,
+            address["street"],
+            address["zip_code"],
+            address["city"],
+            "",
+            address["country"],
+            addresstype,
+        )
 
     @staticmethod
     def address_exists(profile, address):
@@ -294,15 +433,15 @@ class Hatchbuck:
         for element in profile[dictname]:
             if dictname == "phones":
                 # ignore spaces in phone numbers when comparing
-                return self.cleanup_phone_number(
+                return self._cleanup_phone_number(
                     element[attributename]
-                ) == self.cleanup_phone_number(value)
+                ) == self._cleanup_phone_number(value)
             if element[attributename].lower() == value.lower():
                 return True
         return False
 
     @staticmethod
-    def cleanup_phone_number(value):
+    def _cleanup_phone_number(value):
         """
         remove unneeded characters from phone numbers
         :param value: phone number
@@ -313,7 +452,7 @@ class Hatchbuck:
             value = value.replace(rep, "")
         return value
 
-    def format_phone_number(self, number, country=None):
+    def _format_phone_number(self, number, country=None):
         """
         format phone number in international format
         :param number: phone number
@@ -321,7 +460,9 @@ class Hatchbuck:
         :return: clean phone number
         """
         try:
-            phonenumber = phonenumbers.parse(self.cleanup_phone_number(number), country)
+            phonenumber = phonenumbers.parse(
+                self._cleanup_phone_number(number), country
+            )
             return phonenumbers.format_number(
                 phonenumber, phonenumbers.PhoneNumberFormat.INTERNATIONAL
             )
@@ -336,17 +477,17 @@ class Hatchbuck:
         :return: modified profile
         """
         # check if there is consensus about the contacts country
-        countrycode = self.get_countrycode(profile)
+        countrycode = self._get_countrycode(profile)
 
         for num in list(profile.get("phones", [])):
             # iterate through a copy of the list to be able to delete elements
             # when self.noop is True
-            formatted = self.format_phone_number(num["number"])
+            formatted = self._format_phone_number(num["number"])
             if formatted is None and countrycode is not None:
-                formatted = self.format_phone_number(num["number"], countrycode)
+                formatted = self._format_phone_number(num["number"], countrycode)
             if formatted is None:
                 # local number and unknown country? ignore and continue
-                formatted = self.cleanup_phone_number(num["number"])
+                formatted = self._cleanup_phone_number(num["number"])
             # check if this number is a duplicate
             if any(
                 [
@@ -355,7 +496,7 @@ class Hatchbuck:
                         other["number"] == formatted  # same number
                         or (
                             formatted.startswith("0")  # local number
-                            and self.cleanup_phone_number(other["number"]).endswith(
+                            and self._cleanup_phone_number(other["number"]).endswith(
                                 formatted[1:]
                             )
                         )
@@ -371,21 +512,10 @@ class Hatchbuck:
                     self.short_contact(profile),
                     num["number"],
                 )
-                if self.noop:
-                    profile["phones"].remove(num)
-                else:
-                    newprofile = self.update(
-                        profile["contactId"],
-                        {
-                            "phones": [
-                                {"number": "", "id": num["id"], "type": num["type"]}
-                            ]
-                        },
-                    )
-                    if newprofile is not None:
-                        # if the update was successful continue working
-                        # with the new profile
-                        profile = newprofile
+                profile = self.silent_update(
+                    profile,
+                    {"phones": [{"number": "", "id": num["id"], "type": num["type"]}]},
+                )
 
             elif formatted != num["number"]:
                 # the number was updated
@@ -394,32 +524,21 @@ class Hatchbuck:
                     self.short_contact(profile),
                     formatted,
                 )
-                if self.noop:
-                    num["number"] = formatted
-                else:
-                    newprofile = self.update(
-                        profile["contactId"],
-                        {
-                            "phones": [
-                                {
-                                    "number": formatted,
-                                    "id": num["id"],
-                                    "type": num["type"],
-                                }
-                            ]
-                        },
-                    )
-                    if newprofile is not None:
-                        # if the update was successful continue working
-                        # with the new profile
-                        profile = newprofile
+                profile = self.silent_update(
+                    profile,
+                    {
+                        "phones": [
+                            {"number": formatted, "id": num["id"], "type": num["type"]}
+                        ]
+                    },
+                )
             else:
                 # number was not changed
                 pass
         return profile
 
     @staticmethod
-    def get_countrycode(profile):
+    def _get_countrycode(profile):
         """
         Extract country code from addresses
         :param profile: contact profile
@@ -449,6 +568,265 @@ class Hatchbuck:
         for email in profile.get("emails", []):
             text += "%s, " % email["address"]
         return "Contact(%s)" % text[:-2]
+
+    def clean_all_addresses(self, profile):
+        """
+        clean and deduplicate all contact addresses
+        :param profile: contact profile
+        :return: cleaned and deduplicated profile
+        """
+        for address in copy.deepcopy(profile.get("addresses", [])):
+            # iterate through a copy of the list to be able to delete entries in-flight
+            # clean up the address first
+            new = copy.deepcopy(address)
+            new = self._clean_address(new)
+            logging.info("iterating old: %s, new: %s", address, new)
+            if new != address:
+                # there was an update
+                logging.info(
+                    "%s: updating address to %s", self.short_contact(profile), new
+                )
+                profile = self.silent_update(profile, {"addresses": [new]})
+            # now check if there is a more-specific address that makes
+            # this address obsolete/redundant
+            for other in profile["addresses"]:
+                if (
+                    other.get("id", "") != new.get("id", "")
+                    and other != new
+                    and self._address_obsolete(new, other)
+                ):
+                    # we are an obsolete address
+                    logging.info(
+                        "%s: deleting obsolete address %s",
+                        self.short_contact(profile),
+                        new,
+                    )
+                    profile = self.silent_update(
+                        profile,
+                        {
+                            "addresses": [
+                                {
+                                    "id": new["id"],
+                                    "type": new["type"],
+                                    "city": "",
+                                    "country": "",
+                                    "countryId": "",
+                                    "state": "",
+                                    "street": "",
+                                    "zip": "",
+                                }
+                            ]
+                        },
+                    )
+                    if new.get("isPrimary", False):
+                        # uh-oh we deleted the the primary address
+                        profile = self.silent_update(
+                            profile,
+                            {
+                                "addresses": [
+                                    {
+                                        "id": other["id"],
+                                        "type": other["type"],
+                                        "isPrimary": True,
+                                    }
+                                ]
+                            },
+                        )
+                    break  # from finding the redundant other
+
+        return profile
+
+    def _address_obsolete(self, this, other):
+        """
+        Decide if this address is redundant/less-specific/obsolete compared to other
+        :param this: this address
+        :param other: other address
+        :return: True if this is redundant to other
+        """
+        for field in self.listdictkeys["addresses"]:
+            if this.get(field, False) and (
+                not other.get(field, False) or this[field] != other[field]
+            ):
+                # if this has a country/state/city/zip/street and other not or not
+                # the same -> this is more specific
+                logging.debug(
+                    "%s has more information than %s, not obsolete", this, other
+                )
+                return False
+
+        if all(
+            [
+                not this.get(field, False) or this[field] == other[field]
+                for field in self.listdictkeys["addresses"]
+            ]
+        ):
+            # this matches other in all non-empty fields -> this is redundant
+            logging.debug(
+                "%s has only empty or same fields than %s, obsolete", this, other
+            )
+            return True
+
+        thisscore = 0
+        otherscore = 0
+        for field in self.listdictkeys["addresses"]:
+            if this.get(field, False):
+                thisscore = thisscore * 2 + 1
+            if other.get(field, False):
+                otherscore = otherscore * 2 + 1
+        if thisscore > otherscore:
+            logging.debug(
+                "%s score %s > %s score %s, not obsolete",
+                this,
+                thisscore,
+                other,
+                otherscore,
+            )
+            return False
+        logging.debug(
+            "%s score %s <= %s score %s, obsolete", this, thisscore, other, otherscore
+        )
+        return True
+
+    def _clean_address(self, address):  # pylint: disable=too-many-branches
+        """
+        clean up an address
+        :param address: address dict
+        :return: cleaned up address
+        """
+        if address.get("country", ""):
+            # check if the country is a valid country name
+            # this also fixes two letter country codes
+            try:
+                country = countries.search_fuzzy(
+                    self._clean_country_name(address["country"])
+                )[0].name
+            except LookupError:
+                country = False
+            if country and country != address["country"]:
+                address["country"] = country
+        if re.match(r"^[a-zA-Z]{2}-[0-9]{4,6}$", address.get("zip", "")):
+            # zipcode contains country code (e.g. CH-8005)
+            countrycode, zipcode = address["zip"].split("-")
+            try:
+                address["country"] = countries.lookup(countrycode).name
+                address["zip"] = zipcode
+            except LookupError:
+                pass
+        if (
+            not address.get("street", "")
+            and not address.get("zip", "")
+            and address.get("city", "")
+        ):
+            # there is a city but no street/zip
+            # logging.warning(address["city"].split(","))
+            if len(address["city"].split(",")) == 3:
+                # Copenhagen Area, Capital Region, Denmark
+                # Lausanne, Canton de Vaud, Suisse
+                # Vienna, Vienna, Austria
+                try:
+                    address["country"] = countries.search_fuzzy(
+                        self._clean_country_name(address["city"].split(",")[2])
+                    )[0].name
+                    address["city"] = self._clean_city_name(
+                        address["city"].split(",")[0]
+                    )
+                except LookupError:
+                    pass
+            elif len(address["city"].split(",")) == 2:
+                # Zürich und Umgebung, Schweiz
+                # Currais Novos e Região, Brasil
+                # München und Umgebung, Deutschland
+                # Région de Genève, Suisse
+                # Zürich Area, Svizzera
+                try:
+                    address["country"] = countries.search_fuzzy(
+                        self._clean_country_name(address["city"].split(",")[1])
+                    )[0].name
+                    address["city"] = self._clean_city_name(
+                        address["city"].split(",")[0]
+                    )
+                except LookupError:
+                    pass
+            elif len(address["city"].split(",")) == 1:
+                # United States
+                # Switzerland
+                # Luxembourg
+                try:
+                    address["country"] = countries.search_fuzzy(
+                        self._clean_country_name(self._clean_city_name(address["city"]))
+                    )[0].name
+                    # if the lookup is successful this is a country name, not city name
+                    address["city"] = ""
+                except LookupError:
+                    pass
+
+        if address.get("type", "") not in ["Work", "Home", "Other"]:
+            address["type"] = "Other"
+        # ensure all relevant fields are set
+        address["street"] = self._clean_street_name(address.get("street", ""))
+        address["city"] = self._clean_city_name(address.get("city", ""))
+        address["zip"] = address.get("zip", "").strip()
+        address["state"] = address.get("state", "").strip()
+        address["country"] = self._clean_country_name(address.get("country", ""))
+        return address
+
+    @staticmethod
+    def _clean_street_name(street):
+        """
+        clean and normalize street name
+        :param street: street
+        :return: clean street name
+        """
+        if street.strip() == "geolocation":
+            # magic word from website geolocation
+            street = ""
+        if street.strip() == "False":
+            # bug in odoo2hatchbuck
+            street = ""
+        street = street.replace("str. ", "strasse ")
+        street = street.replace("str ", "strasse ")
+        return street.strip()
+
+    @staticmethod
+    def _clean_country_name(country):
+        """
+        look up country names not covered by pycountry
+        :param country: country
+        :return: clean country name
+        """
+        if country is None:
+            country = ""
+        country = country.strip()
+        mapping = {
+            "suisse": "Switzerland",
+            "svizzera": "Switzerland",
+            "schweiz": "Switzerland",
+            "deutschland": "Germany",
+            "brasil": "Brazil",
+        }
+        return mapping.get(country.lower(), country)
+
+    @staticmethod
+    def _clean_city_name(city):
+        """
+        remove "area", "region" words from city names
+        :param city: city name
+        :return: clean city name
+        """
+        for word in [
+            " Bay Area",
+            " area",
+            " Area",
+            "Greater ",
+            "und Umgebung",
+            "e Região",
+            "Région de",
+        ]:
+            city = city.replace(word, "")
+
+        mapping = {"zurich": "Zürich"}
+
+        return mapping.get(city.strip().lower(), city.strip())
 
     def profile_add(
         self, profile, dictname, attributename, valuelist, moreattributes=None
@@ -508,7 +886,7 @@ class Hatchbuck:
                         )
                         return profile
                 elif dictname == "phones" and attributename == "number":
-                    value = self.cleanup_phone_number(value)
+                    value = self._cleanup_phone_number(value)
                 if moreattributes is not None:
                     for key in moreattributes:
                         updateprofile[dictname][0][key] = moreattributes[key]
