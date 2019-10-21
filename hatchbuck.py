@@ -321,27 +321,34 @@ class Hatchbuck:
         return None
 
     def add_address(
-        self, profile, street="", zip="", city="", state="", country="", type="Work"
-    ):
+        self,
+        profile,
+        street="",
+        zipcode="",
+        city="",
+        state="",
+        country="",
+        addresstype="Work",
+    ):  # pylint: disable=too-many-arguments,too-many-branches
         """
         Add street address to profile and return updated profile
         :param profile: profile to add address to
         :param street: street name and number
-        :param zip: zip code
+        :param zipcode: zip code
         :param city: city
         :param state: state
         :param country: country (preferably english version)
-        :param type: "Work", "Home" or "Other"
+        :param addresstype: "Work", "Home" or "Other"
         :return: updated profile
         """
         update = self._clean_address(
             {
                 "street": street,
-                "zip": zip,
+                "zip": zipcode,
                 "city": city,
                 "state": state,
                 "country": country,
-                "type": type,
+                "type": addresstype,
             }
         )
         for address in profile.get("addresses", []):
@@ -680,7 +687,7 @@ class Hatchbuck:
         )
         return True
 
-    def _clean_address(self, address):
+    def _clean_address(self, address):  # pylint: disable=too-many-branches
         """
         clean up an address
         :param address: address dict
