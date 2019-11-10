@@ -2,7 +2,7 @@
 Hatchbuck.com CRM API bindings for Python |latest-version|
 ==========================================================
 
-|build-status| |python-support| |license|
+|build-status| |python-support| |license| |coverage|
 
 This python package provides an easy to use python module to interact with the
 `hatchbuck.com API`_.
@@ -19,6 +19,9 @@ This python package provides an easy to use python module to interact with the
 .. |license| image:: https://img.shields.io/pypi/l/hatchbuck.svg
    :alt: Software license
    :target: https://github.com/vshn/python-hatchbuck/blob/master/LICENSE
+.. |coverage| image:: https://codecov.io/gh/vshn/python-hatchbuck/branch/master/graph/badge.svg
+   :alt: Test coverage report
+   :target: https://codecov.io/gh/vshn/python-hatchbuck
 .. _hatchbuck.com API:
     https://hatchbuck.freshdesk.com/support/solutions/articles/5000578765-hatchbuck-api-documentation-for-advanced-users
 
