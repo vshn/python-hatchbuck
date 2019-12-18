@@ -548,13 +548,13 @@ class Hatchbuck:
         for addr in profile.get("addresses", []):
             if (
                 addr.get("country", False)
-                and addr["country"].lower() not in countries_found
+                and addr["country"].strip().lower() not in countries_found
             ):
-                countries_found.append(addr["country"].lower())
+                countries_found.append(addr["country"].strip().lower())
         logging.debug("countries found %s", countries_found)
         if len(countries_found) == 1:
             # look up the country code
-            return countries.lookup(countries_found[0]).alpha_2
+            return countries.search_fuzzy(countries_found[0])[0].alpha_2
         return None
 
     @staticmethod

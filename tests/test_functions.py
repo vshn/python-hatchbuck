@@ -275,6 +275,32 @@ class TestHatchbuck(unittest.TestCase):
             },
         )
 
+        profile3 = {
+            "phones": [
+                {
+                    "id": "1",
+                    "number": "(044) 545-53-00",
+                    "type": "Work",
+                    "typeId": "asdf",
+                }
+            ],
+            "addresses": [{"country": "Switzerland "}],  # note the space
+        }
+        self.assertEqual(
+            hatchbuck.clean_all_phone_numbers(profile3),
+            {
+                "phones": [
+                    {
+                        "id": "1",
+                        "number": "+41 44 545 53 00",
+                        "type": "Work",
+                        "typeId": "asdf",
+                    }
+                ],
+                "addresses": [{"country": "Switzerland "}],
+            },
+        )
+
     def test_short_contact(self):
         hatchbuck = Hatchbuck("")
         hatchbuck.noop = True
