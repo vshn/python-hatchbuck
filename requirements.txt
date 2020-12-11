@@ -1,5 +1,5 @@
 -e .
-certifi==2019.9.11
+certifi==2020.12.5
 chardet==3.0.4
 idna==2.8
 pycountry==19.8.18
