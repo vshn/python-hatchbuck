@@ -3,5 +3,5 @@ certifi==2019.9.11
 chardet==3.0.4
 idna==2.8
 pycountry==19.8.18
-requests==2.22.0
+requests==2.27.1
 urllib3==1.25.6
